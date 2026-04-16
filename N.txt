@@ -1,0 +1,58 @@
+
+#cmake -G Ninja \
+
+
+srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=12 --pty bash -l
+
+source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
+
+cmake \
+  -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda/install \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+../testTrilinosKokkos
+
+
+mpirun -n 12 ./exe
+
+
+
+srun --exclusive --constraint="h100" --partition=h100 --pty bash
+
+source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
+
+
+
+
+
+
+# OPENMP:
+
+srun --exclusive --constraint="cascadelake" --partition=cascadelake --pty bash
+
+source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kOpenMP_obOpenMP.sh
+
+export LD_LIBRARY_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install/lib:$LD_LIBRARY_PATH
+
+cmake \
+  -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+../testTrilinosKokkos
+
+
+
+
+
+
+# BY THE WAY:
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    COMMENT
+    Tpetra_INST_Cuda
+    Tpetra_INST_Serial
+    Trilinos_ENABLE_Cuda
+    Trilinos_ENABLE_SERIAL
+    Trilinos_ENABLE_Serial
+    _COMMENT_TPL_ENABLE_BLAS
+    _COMMENT_TPL_ENABLE_LAPACK
+    _COMMENT_TPL_ENABLE_ScaLAPACK
