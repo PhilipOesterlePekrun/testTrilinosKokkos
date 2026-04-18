@@ -12,11 +12,15 @@
 #include <chrono>
 #include <iostream>
 
+#include <mirco_evaluate.h>
+#include <mirco_inputparameters.h>
 #include <mirco_kokkostypes.h>
+#include <mirco_topologyutilities.h>
 
 int main(int argc, char* argv[])
 {
   const auto startTime = std::chrono::steady_clock::now();
+  auto betweenTime = std::chrono::steady_clock::now();
   
   int rank = 0, size = 1;
   {
@@ -51,31 +55,34 @@ int main(int argc, char* argv[])
       std::cout << "num devices = " << Kokkos::num_devices() << '\n';
     }
 
-    // Independent Kokkos work
-    double local_micro_value = 0.0;
     {
-      Kokkos::View<double*> micro("micro", 8);
 
-      Kokkos::parallel_for(
-        "fill_micro",
-        Kokkos::RangePolicy<Kokkos::DefaultExecutionSpace>(0, 8),
-        KOKKOS_LAMBDA(const int i) {
-          micro(i) = 0.1 * (i + 1) * (rank + 1);
-        });
 
-      Kokkos::parallel_reduce(
-        "sum_micro",
-        Kokkos::RangePolicy<Kokkos::DefaultExecutionSpace>(0, 8),
-        KOKKOS_LAMBDA(const int i, double& sum) {
-          sum += micro(i);
-        },
-        local_micro_value);
+      const auto start = std::chrono::high_resolution_clock::now();
 
-      Kokkos::fence();
+      InputParameters inputParams(1, 1, 0.3, 0.3, 1e-6, 5, 1000, 7, 5, 0.5, 100, false, true, false, 120);
+
+      ViewVector_d meshgrid = CreateMeshgrid(inputParams.N, inputParams.grid_size);
+      const double topologyMax = GetMax(inputParams.topology);
+
+      // Main evaluation agorithm
+      double meanPressure, effectiveContactAreaFraction;
+      Evaluate(meanPressure, effectiveContactAreaFraction, inputParams, topologyMax, meshgrid);
+
+      const auto finish = std::chrono::high_resolution_clock::now();
+
+      /*std::cout << std::setprecision(16) << "Mean pressure is: " << meanPressure
+                << "\nEffective contact area fraction is: " << effectiveContactAreaFraction
+                << std::endl;*/
+
+      //const double elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(finish - start).count();
+      //std::cout << "Elapsed time is: " + std::to_string(elapsedTime) + "s" << std::endl;
     }
 
-    double coupled_scalar = 0.0;
-    MPI_Allreduce(&local_micro_value, &coupled_scalar, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    ///double coupled_scalar = 0.0;
+    ///MPI_Allreduce(&local_micro_value, &coupled_scalar, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    betweenTime = std::chrono::steady_clock::now();
+    
 
     {
       using LO = int;
@@ -110,7 +117,7 @@ if (rank == 0) {
 
       auto map = Teuchos::rcp(new map_type(global_num_rows, local_num_rows, 0, comm));
       vec_type x(map);
-
+/*
       x.putScalar(coupled_scalar);
 
       auto x_host = x.getLocalViewHost(Tpetra::Access::ReadOnly);
@@ -135,13 +142,16 @@ if (rank == 0) {
         std::cout << "global_tpetra_sum = " << global_tpetra_sum << '\n';
       }
     }
+      */
   }
+}
   
   const double t =
       std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 
   if (!rank) {
-    std::cout << "Total wall time: " << t << " s\n";
+    std::cout << "Total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
+    std::cout << "betweenTime: " << std::chrono::duration<double>(betweenTime - startTime).count() << " s\n";
   }
 
   return 0;

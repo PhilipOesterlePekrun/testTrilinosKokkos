@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_PREFIX_PATH ${TRILINOS_PATH} ${CMAKE_PREFIX_PATH})
 find_package(Trilinos REQUIRED COMPONENTS Kokkos Tpetra)
 
-set(MIRCO_PATH "/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda/lib/cmake/mirco")
 find_package(mirco_lib CONFIG HINTS ${MIRCO_PATH})
 
 if(true)

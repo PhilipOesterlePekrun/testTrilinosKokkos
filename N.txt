@@ -2,13 +2,20 @@
 #cmake -G Ninja \
 
 
+# FOR mpirun -n 12:
 srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=12 --pty bash -l
+# FOR make -j:
+srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=1 --cpus-per-task=64 --pty bash -l
 
 source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
+
+export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper
+export LD_LIBRARY_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda/install/lib:$LD_LIBRARY_PATH
 
 cmake \
   -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda/install \
   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda/lib/cmake/mirco" \
 ../testTrilinosKokkos
 
 
@@ -16,18 +23,51 @@ mpirun -n 12 ./exe
 
 
 
-srun --exclusive --constraint="h100" --partition=h100 --pty bash
 
 source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
 
 
 
 
+# cuda_NO_TPETRA_INST_CUDA:
+
+srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=1 --cpus-per-task=64 --pty bash -l
+
+source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
+
+export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper
+export LD_LIBRARY_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:$LD_LIBRARY_PATH
+
+cmake \
+  -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+../testTrilinosKokkos
+
+
+
+
+
+
+
+
+mpicc   --showme
+mpicc   --showme:compile
+mpicc   --showme:link
+
+mpicxx  --showme
+mpicxx  --showme:compile
+mpicxx  --showme:link
+echo "$OMPI_CXX"
+
+
 
 
 # OPENMP:
 
-srun --exclusive --constraint="cascadelake" --partition=cascadelake --pty bash
+srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=12 --pty bash
+
+srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=1 --cpus-per-task=52 --pty bash
 
 source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kOpenMP_obOpenMP.sh
 
@@ -36,6 +76,7 @@ export LD_LIBRARY_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_fu
 cmake \
   -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install \
   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+openmp_openblasOpenMP/lib/cmake/mirco" \
 ../testTrilinosKokkos
 
 
