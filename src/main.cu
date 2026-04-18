@@ -18,9 +18,7 @@
 #include <mirco_kokkostypes.h>
 #include <mirco_topologyutilities.h>
 
-#ifdef inh
 #include "in.h"
-#endif
 
 int main(int argc, char* argv[])
 {
@@ -150,7 +148,7 @@ if (rank == 0) {
       */
   }
   
-  #ifdef inh
+  
   {
     ryml::ConstNodeRef inputRoot;
     {
@@ -169,7 +167,6 @@ if (rank == 0) {
       std::cout<<"RYML: bool1="<<bool1<<"\n";
     }
   }
-  #endif
   
   
 }

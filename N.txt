@@ -42,7 +42,12 @@ cmake \
   -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install \
   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  \
 ../testTrilinosKokkos
+
+  -DCMAKE_CUDA_COMPILER=/path/to/nvcc \
+  -DCMAKE_CUDA_HOST_COMPILER=/usr/bin/g++
 
 
 
@@ -60,6 +65,9 @@ mpicxx  --showme:compile
 mpicxx  --showme:link
 echo "$OMPI_CXX"
 
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:incdirs
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:compile
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:link
 
 
 
