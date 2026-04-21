@@ -82,6 +82,9 @@ srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=12 --
 srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=1 --cpus-per-task=52 --pty bash
 
 srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=4 --cpus-per-task=8 --pty bash
+export OMP_NUM_THREADS=8
+export OMP_PROC_BIND=spread
+export OMP_PLACES=threads
 
 
 source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kOpenMP_obOpenMP.sh

@@ -39,19 +39,41 @@ constexpr auto trigger = weird_index_map<3, 3, 3, 3>();
 
 int main(int argc, char* argv[])
 {
-  Tpetra::ScopeGuard scope(&argc, &argv);
+  
+  const auto startTime = std::chrono::steady_clock::now();
+  
+  int rank = 0, size = 1;
   {
-    using map_type = Tpetra::Map<>;
-    using vec_type = Tpetra::Vector<>;
+    MPI_Init(&argc, &argv);
+    struct CleanUpMPI
+    {
+      ~CleanUpMPI() { MPI_Finalize(); }
+    } cleanup_mpi;
 
-    auto comm = Tpetra::getDefaultComm();
-    auto map = Teuchos::rcp(new map_type(5, 0, comm));
-    vec_type x(map);
-    x.putScalar(1.0);
+    Kokkos::ScopeGuard kokkos_guard(argc, argv);
+    
+    ////////////////////////////////////////////
+    {
+      using map_type = Tpetra::Map<>;
+      using vec_type = Tpetra::Vector<>;
 
-    if (comm->getRank() == 0)
-      std::cout << "trigger[0] = " << trigger[0]
-                << ", norm1 = " << x.norm1() << '\n';
+      auto comm = Tpetra::getDefaultComm();
+      auto map = Teuchos::rcp(new map_type(2, 0, comm));
+      vec_type x(map);
+      x.putScalar(1.0);
+
+      if (comm->getRank() == 0)
+        std::cout << "trigger[0] = " << trigger[0]
+                  << ", norm1 = " << x.norm1() << '\n';
+    }
   }
+  
+  const double t =
+      std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
+
+  if (!rank) {
+    std::cout << "Total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
+  }
+
   return 0;
 }

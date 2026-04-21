@@ -20,10 +20,11 @@ int main(int argc, char* argv[])
     } cleanup_mpi;
 
     Kokkos::ScopeGuard kokkos_guard(argc, argv);
+    
+    ////////////////////////////////////////////
 
     MPI_TpetraSerial_KokkosCuda(argc, argv);
-  
-}
+  }
   
   const double t =
       std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();

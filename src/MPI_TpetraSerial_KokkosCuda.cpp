@@ -33,17 +33,29 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   {
     using namespace MIRCO;
+    
+    if(!rank) {
+      std::cout << "-- Kokkos information --\n";
+      std::cout << "Threads in use: " << ExecSpace_Default_t().concurrency() << "\n";
+      std::cout << "Default execution space: " << typeid(ExecSpace_Default_t).name() << "\n";
+      std::cout << "Default host execution space: " << typeid(ExecSpace_DefaultHost_t).name() << "\n";
+      std::cout << "Default memory space: " << typeid(MemorySpace_ofDefaultExec_t).name() << "\n";
+      std::cout << "Default host memory space: " << typeid(MemorySpace_Host_t).name() << "\n";
+      std::cout << "\n";
+      
+      std::cout << "num devices = " << Kokkos::num_devices() << '\n';
+    }
 
     const auto start = std::chrono::high_resolution_clock::now();
 
-    InputParameters inputParams(1, 1, 0.3, 0.3, 1e-6, 5, 1000, 7, 5, 0.5, 100, false, true, false, 120);
+    InputParameters inputParams(1, 1, 0.3, 0.3, 1e-6, 10/*delta*/, 1000/*laterallength*/, 7/*resolution*/, 10/*stddev*/, 0.5/*hurst*/, 100, false, true, false, 120);
 
     ViewVector_d meshgrid = CreateMeshgrid(inputParams.N, inputParams.grid_size);
     const double topologyMax = GetMax(inputParams.topology);
 
     // Main evaluation agorithm
     double meanPressure, effectiveContactAreaFraction;
-    Evaluate(meanPressure, effectiveContactAreaFraction, inputParams, topologyMax, meshgrid);
+    if(!rank)Evaluate(meanPressure, effectiveContactAreaFraction, inputParams, topologyMax, meshgrid);
 
     const auto finish = std::chrono::high_resolution_clock::now();
 
@@ -148,8 +160,8 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
       std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 
   if (!rank) {
-    std::cout << "MPI_TpetraSerial_KokkosCuda total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
     std::cout << "MPI_TpetraSerial_KokkosCuda betweenTime: " << std::chrono::duration<double>(betweenTime - startTime).count() << " s\n";
+    std::cout << "MPI_TpetraSerial_KokkosCuda total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
   }
 
   return 0;
