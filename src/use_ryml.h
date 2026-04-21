@@ -1,5 +1,7 @@
 #pragma once
 
+#include "use_ryml_fwd.h"
+
 #include <optional>
 #include <ryml.hpp>
 #include <ryml_std.hpp>

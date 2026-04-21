@@ -19,7 +19,7 @@ cmake \
 ../testTrilinosKokkos
 
 
-mpirun -n 12 ./exe
+mpirun -n 4 ./exe
 
 
 
@@ -31,20 +31,24 @@ source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
 
 # cuda_NO_TPETRA_INST_CUDA:
 
+srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=4 --pty bash -l
+
 srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=1 --cpus-per-task=64 --pty bash -l
 
 source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
 
-export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper
+#export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper # actually dont do this because we have the kokkos as compile language thing
 export LD_LIBRARY_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:$LD_LIBRARY_PATH
 
 cmake \
   -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install \
   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
-  -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
   \
 ../testTrilinosKokkos
+
+  -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+
 
   -DCMAKE_CUDA_COMPILER=/path/to/nvcc \
   -DCMAKE_CUDA_HOST_COMPILER=/usr/bin/g++
@@ -76,6 +80,9 @@ echo "$OMPI_CXX"
 srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=12 --pty bash
 
 srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=1 --cpus-per-task=52 --pty bash
+
+srun --exclusive --constraint=cascadelake --partition=cascadelake --ntasks=4 --cpus-per-task=8 --pty bash
+
 
 source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kOpenMP_obOpenMP.sh
 

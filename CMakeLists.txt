@@ -6,10 +6,12 @@ project(testTrilinosKokkos LANGUAGES CXX)# CUDA)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_PREFIX_PATH ${TRILINOS_PATH} ${CMAKE_PREFIX_PATH})
 find_package(Trilinos REQUIRED COMPONENTS Kokkos Tpetra)
 
-find_package(mirco_lib CONFIG HINTS ${MIRCO_PATH})
+find_package(mirco_lib CONFIG REQUIRED HINTS ${MIRCO_PATH})
 
 
 
@@ -27,7 +29,7 @@ if(true)
     )
   endif()
 
-  if(CMAKE_CUDA_COMPILER)
+  if(Kokkos_ENABLE_CUDA)
     add_compile_options(
       $<$<COMPILE_LANGUAGE:CUDA>:-w>
       $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-w>
@@ -35,42 +37,31 @@ if(true)
   endif()
 endif()
 
-
-
-
-if(Kokkos_ENABLE_CUDA)
-  message("============ CRIT { ============")
-  message("Kokkos_ENABLE_CUDA=true; enabling language CUDA")
-  message("============ CRIT } ============")
-  
-  enable_language(CUDA)
-endif()
-
 message(STATUS "Fetching rapidyaml...")
 include(FetchContent)
-
-set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "" FORCE) # Suppress developer warnings from ryml
-
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "" FORCE) # Suppress developer warnings from ryml=
 FetchContent_Declare(rapidyaml
   GIT_REPOSITORY https://github.com/biojppm/rapidyaml.git
   GIT_TAG 47ec2fa184209687c20fd5bc05621e1cb1200311
 )
 FetchContent_MakeAvailable(rapidyaml)
-
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF CACHE BOOL "" FORCE)
 
-
-
-
-
-add_library(inTarget
-  src/in.cpp
+add_library(use_ryml
+  src/use_ryml.cpp
   )
-target_link_libraries(inTarget PUBLIC ryml)
+target_link_libraries(use_ryml PUBLIC ryml)
 
 
 
-if(Kokkos_ENABLE_CUDA)
+add_library(MPI_TpetraSerial_KokkosCuda
+  src/MPI_TpetraSerial_KokkosCuda.cpp
+  )
+target_link_libraries(MPI_TpetraSerial_KokkosCuda PRIVATE mirco::mirco_lib PUBLIC Trilinos::all_selected_libs use_ryml)
+
+
+
+if(false)#Kokkos_ENABLE_CUDA)
   add_executable(exe src/main.cu)
   
   target_include_directories(exe PRIVATE
@@ -98,5 +89,8 @@ if(Kokkos_ENABLE_CUDA)
 else()
   add_executable(exe src/main.cpp)
 endif()
+target_link_libraries(exe PRIVATE MPI_TpetraSerial_KokkosCuda)
 
-target_link_libraries(exe PRIVATE Trilinos::all_selected_libs mirco::mirco_lib inTarget)
+add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)
+target_link_libraries(exe_nvcc_fails PRIVATE Trilinos::all_selected_libs)#Tpetra)
+
