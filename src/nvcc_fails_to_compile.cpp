@@ -9,8 +9,9 @@
 #include <cstddef>
 #include <iostream>
 
+/*__host__ (tried; doesn't work)*/
 template <std::size_t... n>
-consteval auto weird_index_map()
+consteval auto breaks_nvcc()
 {
   constexpr std::array shape = {n...};
 
@@ -24,8 +25,8 @@ consteval auto weird_index_map()
   }
   else
   {
-    std::array left = weird_index_map<shape[0], shape[1]>();
-    std::array right = weird_index_map<shape[2], shape[3]>();
+    std::array left = breaks_nvcc<shape[0], shape[1]>();
+    std::array right = breaks_nvcc<shape[2], shape[3]>();
 
     std::array<std::size_t, left.size() * right.size()> out{};
     for (std::size_t j = 0; j < right.size(); ++j)
@@ -34,8 +35,6 @@ consteval auto weird_index_map()
     return out;
   }
 }
-
-constexpr auto trigger = weird_index_map<3, 3, 3, 3>();
 
 int main(int argc, char* argv[])
 {
@@ -53,7 +52,7 @@ int main(int argc, char* argv[])
     Kokkos::ScopeGuard kokkos_guard(argc, argv);
     
     ////////////////////////////////////////////
-    {
+    {      
       using map_type = Tpetra::Map<>;
       using vec_type = Tpetra::Vector<>;
 
@@ -61,6 +60,8 @@ int main(int argc, char* argv[])
       auto map = Teuchos::rcp(new map_type(2, 0, comm));
       vec_type x(map);
       x.putScalar(1.0);
+      
+      constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
 
       if (comm->getRank() == 0)
         std::cout << "trigger[0] = " << trigger[0]
