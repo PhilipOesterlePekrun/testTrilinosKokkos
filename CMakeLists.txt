@@ -8,10 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_PREFIX_PATH ${TRILINOS_PATH} ${CMAKE_PREFIX_PATH})
-find_package(Trilinos REQUIRED COMPONENTS Kokkos Tpetra)
 
-find_package(mirco_lib CONFIG REQUIRED HINTS ${MIRCO_PATH})
 
 
 
@@ -37,6 +34,9 @@ if(true)
   endif()
 endif()
 
+
+
+
 message(STATUS "Fetching rapidyaml...")
 include(FetchContent)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "" FORCE) # Suppress developer warnings from ryml=
@@ -46,6 +46,39 @@ FetchContent_Declare(rapidyaml
 )
 FetchContent_MakeAvailable(rapidyaml)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF CACHE BOOL "" FORCE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+set(CMAKE_PREFIX_PATH ${TRILINOS_PATH} ${CMAKE_PREFIX_PATH})
+find_package(Trilinos REQUIRED COMPONENTS Kokkos Tpetra)
+
+find_package(mirco_lib CONFIG REQUIRED HINTS ${MIRCO_PATH})
+
+
+
+
+
+#find_package(Kokkos REQUIRED COMPONENTS separable_compilation)
+#enable_language(${Kokkos_COMPILE_LANGUAGE})
+
+
 
 add_library(use_ryml
   src/use_ryml.cpp
@@ -58,39 +91,24 @@ add_library(MPI_TpetraSerial_KokkosCuda
   src/MPI_TpetraSerial_KokkosCuda.cpp
   )
 target_link_libraries(MPI_TpetraSerial_KokkosCuda PRIVATE mirco::mirco_lib PUBLIC Trilinos::all_selected_libs use_ryml)
+#kokkos_compilation(TARGET MPI_TpetraSerial_KokkosCuda)
+
+#mark_target_for_kokkos_backend(MPI_TpetraSerial_KokkosCuda)
 
 
-
-if(false)#Kokkos_ENABLE_CUDA)
-  add_executable(exe src/main.cu)
-  
-  target_include_directories(exe PRIVATE
-    /opt/openmpi/4.1.8/gcc/include
-    /opt/openmpi/4.1.8/gcc/include/openmpi
-  )
-  target_link_directories(exe PRIVATE
-    /opt/openmpi/4.1.8/gcc/lib
-  )
-  target_link_libraries(exe PRIVATE mpi)
-  
-  
-  if(false)
-  set(MPI_ASSUME_NO_BUILTIN_MPI TRUE)
-  set(MPI_CXX_COMPILER /opt/openmpi/4.1.8/gcc/bin/mpicxx)
-  find_package(MPI REQUIRED COMPONENTS CXX)
-
-  target_include_directories(exe PRIVATE ${MPI_CXX_INCLUDE_DIRS})
-  target_compile_options(exe PRIVATE ${MPI_CXX_COMPILE_OPTIONS})
-  target_link_options(exe PRIVATE ${MPI_CXX_LINK_FLAGS})
-  target_link_libraries(exe PRIVATE ${MPI_CXX_LIBRARIES})
-  message(STATUS "MPI_CXX_FOUND=${MPI_CXX_FOUND}")
-  message(STATUS "MPI_CXX_COMPILER=${MPI_CXX_COMPILER}")
-  endif()
-else()
-  add_executable(exe src/main.cpp)
-endif()
+add_executable(exe src/main.cpp)
 target_link_libraries(exe PRIVATE MPI_TpetraSerial_KokkosCuda)
 
-add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)
-target_link_libraries(exe_nvcc_fails PRIVATE Trilinos::all_selected_libs)#Tpetra)
 
+find_package(Tpetra REQUIRED)
+set_source_files_properties(src/nvcc_fails_to_compile.cpp PROPERTIES LANGUAGE CXX)
+add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)
+target_link_libraries(exe_nvcc_fails PRIVATE Tpetra::all_libs)#Trilinos::all_selected_libs)#Tpetra)
+
+get_source_file_property(_lang
+  src/nvcc_fails_to_compile.cpp
+  TARGET_DIRECTORY exe_nvcc_fails
+  LANGUAGE
+)
+message(STATUS "LANG = '${_lang}'")
+message(STATUS "CMAKE_CXX_COMPILER = '${CMAKE_CXX_COMPILER}'")

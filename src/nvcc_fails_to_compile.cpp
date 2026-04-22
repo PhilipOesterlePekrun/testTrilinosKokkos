@@ -9,7 +9,11 @@
 #include <cstddef>
 #include <iostream>
 
+<<<<<<< Updated upstream
 /*__host__ (tried; doesn't work)*/
+=======
+/*THIS DOESNT WORK UNFORTUNATELY, BUT IDEA IS FROM [https://www.geeksforgeeks.org/cpp/host-specifier-in-cuda/]: __host__*/
+>>>>>>> Stashed changes
 template <std::size_t... n>
 consteval auto breaks_nvcc()
 {
@@ -61,7 +65,11 @@ int main(int argc, char* argv[])
       vec_type x(map);
       x.putScalar(1.0);
       
+<<<<<<< Updated upstream
       constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
+=======
+      constexpr auto trigger = weird_index_map<3, 3, 3, 3>();
+>>>>>>> Stashed changes
 
       if (comm->getRank() == 0)
         std::cout << "trigger[0] = " << trigger[0]

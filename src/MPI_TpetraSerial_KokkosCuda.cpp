@@ -48,7 +48,7 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
 
     const auto start = std::chrono::high_resolution_clock::now();
 
-    InputParameters inputParams(1, 1, 0.3, 0.3, 1e-6, 10/*delta*/, 1000/*laterallength*/, 7/*resolution*/, 10/*stddev*/, 0.5/*hurst*/, 100, false, true, false, 120);
+    InputParameters inputParams(1, 1, 0.3, 0.3, 1e-6, 8/*delta*/, 1000/*laterallength*/, 7/*resolution*/, 10/*stddev*/, 0.5/*hurst*/, 100, false, true, false, 120);
 
     ViewVector_d meshgrid = CreateMeshgrid(inputParams.N, inputParams.grid_size);
     const double topologyMax = GetMax(inputParams.topology);
