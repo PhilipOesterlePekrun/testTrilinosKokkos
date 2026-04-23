@@ -52,10 +52,17 @@ int main(int argc, char* argv[])
     Kokkos::ScopeGuard kokkos_guard(argc, argv);
     
     ////////////////////////////////////////////
-    {      
-      using map_type = Tpetra::Map<>;
-      using vec_type = Tpetra::Vector<>;
-      
+    {
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+      MPI_Comm_size(MPI_COMM_WORLD, &size);
+    
+      using LO = int;
+      using GO = int;
+      using map_type = Tpetra::Map<LO, GO>;
+      using vec_type = Tpetra::Vector<double, LO, GO>;
+        
+        
+            
       using node_type = typename vec_type::node_type;
       using device_type = typename vec_type::device_type;
       using execution_space = typename vec_type::execution_space;
@@ -70,16 +77,28 @@ int main(int argc, char* argv[])
         std::cout << '\n';
       }
 
-      auto comm = Tpetra::getDefaultComm();
-      auto map = Teuchos::rcp(new map_type(2, 0, comm));
+      auto comm = Teuchos::rcp(
+      new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
+
+      const LO local_num_rows = 200000000;
+      auto map = Teuchos::rcp(
+        new map_type(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(),
+          local_num_rows, 0, comm));
+
       vec_type x(map);
+
       x.putScalar(1.0);
+      x.scale(2.0);
+      auto xNorm = x.norm2();
       
       constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
-
-      if (comm->getRank() == 0)
-        std::cout << "trigger[0] = " << trigger[0]
-                  << ", norm1 = " << x.norm1() << '\n';
+      
+      if (!rank) {
+        std::cout << "nvcc_fails_to_compile work:\n";
+        std::cout << "x.norm2() = " << xNorm << "\n";
+        std::cout << "trigger[0] = "<< trigger[0] << "\n\n";
+      }
+      
     }
   }
   

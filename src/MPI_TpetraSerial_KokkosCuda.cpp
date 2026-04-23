@@ -15,11 +15,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <mirco_evaluate.h>
-#include <mirco_inputparameters.h>
-#include <mirco_kokkostypes.h>
-#include <mirco_topologyutilities.h>
-
+#define use_ryml 1
 #ifdef use_ryml
 #include <ryml.hpp>
 #include <ryml_std.hpp>
@@ -50,7 +46,15 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
   
   // Pure Kokkos
   {
-    using namespace MIRCO;
+    using ExecSpace_DefaultHost_t = Kokkos::DefaultHostExecutionSpace;
+    using ExecSpace_Default_t = Kokkos::DefaultExecutionSpace;
+    using MemorySpace_Host_t = Kokkos::HostSpace;
+    using MemorySpace_ofDefaultExec_t = ExecSpace_Default_t::memory_space;
+    using Device_Host_t = Kokkos::Device<ExecSpace_DefaultHost_t, MemorySpace_Host_t>;
+    using Device_Default_t = Kokkos::Device<ExecSpace_Default_t, MemorySpace_ofDefaultExec_t>;
+
+    using ViewVector_d = Kokkos::View<double*, Kokkos::LayoutLeft, Device_Default_t>;
+    using ViewMatrix_d = Kokkos::View<double**, Kokkos::LayoutLeft, Device_Default_t>;
     
     if(!rank) {
       std::cout << "-- Kokkos information --\n";
@@ -59,20 +63,30 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
       std::cout << "Default host execution space: " << typeid(ExecSpace_DefaultHost_t).name() << "\n";
       std::cout << "Default memory space: " << typeid(MemorySpace_ofDefaultExec_t).name() << "\n";
       std::cout << "Default host memory space: " << typeid(MemorySpace_Host_t).name() << "\n";
-      std::cout << "\n";
-      
-      std::cout << "num devices = " << Kokkos::num_devices() << '\n';
+      std::cout << "Num devices = " << Kokkos::num_devices() << "\n";
+      std::cout << "\n";      
     }
-
-    InputParameters inputParams(1, 1, 0.3, 0.3, 1e-6, 10/*delta*/, 1000/*laterallength*/, 7/*resolution*/, 10/*stddev*/, 0.5/*hurst*/, 100, false, true, false, 120);
-
-    ViewVector_d meshgrid = CreateMeshgrid(inputParams.N, inputParams.grid_size);
-    const double topologyMax = GetMax(inputParams.topology);
-
-    // Main evaluation agorithm; MIRCO uses Kokkos::parallel_for() and Kokkos-Kernels
-    double meanPressure, effectiveContactAreaFraction;
-    if(!rank) Evaluate(meanPressure, effectiveContactAreaFraction, inputParams, topologyMax, meshgrid);
+    
+    for (int active_rank = 0; active_rank < size; ++active_rank) {
+      if (rank == active_rank) {
+        const int n = 200000000;
+        ViewVector_d X_d("X", n);
+        Kokkos::deep_copy(X_d, 0);
+        Kokkos::parallel_for(
+          n, KOKKOS_LAMBDA(const int i) {
+            X_d(i) = 10*rank;
+          });
+        
+        auto X_h = Kokkos::create_mirror_view_and_copy(ExecSpace_DefaultHost_t(), X_d);
+        
+        std::cout << "Kokkos work (rank="<<rank<<"): ";
+        std::cout << "X_h(n/2)="<<X_h(n/2)<<"\n\n";
+      }
+      
+      MPI_Barrier(MPI_COMM_WORLD);
+    }
   }
+  MPI_Barrier(MPI_COMM_WORLD);
 
   const auto betweenTime = std::chrono::steady_clock::now();
   
@@ -100,18 +114,28 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
     }
 
     auto comm = Teuchos::rcp(
-      new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
+    new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
 
-    const LO local_num_rows = 5;
-    const Tpetra::global_size_t global_num_rows =
-      static_cast<Tpetra::global_size_t>(local_num_rows) * size;
+    const LO local_num_rows = 200000000;
+    auto map = Teuchos::rcp(
+      new map_type(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(),
+        local_num_rows, 0, comm));
 
-    auto map = Teuchos::rcp(new map_type(global_num_rows, local_num_rows, 0, comm));
     vec_type x(map);
+
+    x.putScalar(1.0);
+    x.scale(2.0);
+    auto xNorm = x.norm2();
+    if (!rank) {
+      std::cout << "Tpetra work: ";
+      std::cout << "x.norm2() = " << xNorm << "\n\n";
+    }
   }
+  MPI_Barrier(MPI_COMM_WORLD);
   
+  // ryml
   #ifdef use_ryml
-  {
+  if(!rank) {
     ryml::ConstNodeRef inputRoot;
     {
       std::string inputFileName = "../testTrilinosKokkos/input/in1.yaml";
@@ -129,13 +153,14 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
       std::cout<<"RYML: bool1="<<bool1<<"\n";
     }
   }
+  MPI_Barrier(MPI_COMM_WORLD);
   #endif
   
   const double t =
       std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 
   if (!rank) {
-    std::cout << "MPI_TpetraSerial_KokkosCuda betweenTime: " << std::chrono::duration<double>(betweenTime - startTime).count() << " s\n";
+    std::cout << "\nMPI_TpetraSerial_KokkosCuda betweenTime: " << std::chrono::duration<double>(betweenTime - startTime).count() << " s\n";
     std::cout << "MPI_TpetraSerial_KokkosCuda total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
   }
 
