@@ -55,6 +55,20 @@ int main(int argc, char* argv[])
     {      
       using map_type = Tpetra::Map<>;
       using vec_type = Tpetra::Vector<>;
+      
+      using node_type = typename vec_type::node_type;
+      using device_type = typename vec_type::device_type;
+      using execution_space = typename vec_type::execution_space;
+      using memory_space = typename device_type::memory_space;
+
+      if (!rank) {
+        std::cout << "-- Tpetra type information --\n";
+        std::cout << "vec_type::node_type        = " << typeid(node_type).name() << '\n';
+        std::cout << "vec_type::device_type      = " << typeid(device_type).name() << '\n';
+        std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
+        std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
+        std::cout << '\n';
+      }
 
       auto comm = Tpetra::getDefaultComm();
       auto map = Teuchos::rcp(new map_type(2, 0, comm));

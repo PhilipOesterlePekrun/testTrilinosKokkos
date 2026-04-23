@@ -21,7 +21,23 @@
 #include <mirco_topologyutilities.h>
 
 #ifdef use_ryml
-#include "use_ryml.h"
+#include <ryml.hpp>
+#include <ryml_std.hpp>
+template<class T>
+T rget(ryml::ConstNodeRef node, c4::csubstr key)
+{
+  auto child = node.find_child(key);
+  if (!child.readable())
+    throw std::runtime_error(
+        "Parameter \"" + std::string(key.str, key.len) + "\" not found");
+
+  T value{};
+  if (!ryml::read(child, &value))
+    throw std::runtime_error(
+        "Parameter \"" + std::string(key.str, key.len) + "\" has invalid value");
+
+  return value;
+}
 #endif
 
 int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
@@ -31,6 +47,8 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
   int rank = 0, size = 1;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
+  
+  // Pure Kokkos
   {
     using namespace MIRCO;
     
@@ -46,32 +64,19 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
       std::cout << "num devices = " << Kokkos::num_devices() << '\n';
     }
 
-    const auto start = std::chrono::high_resolution_clock::now();
-
     InputParameters inputParams(1, 1, 0.3, 0.3, 1e-6, 10/*delta*/, 1000/*laterallength*/, 7/*resolution*/, 10/*stddev*/, 0.5/*hurst*/, 100, false, true, false, 120);
 
     ViewVector_d meshgrid = CreateMeshgrid(inputParams.N, inputParams.grid_size);
     const double topologyMax = GetMax(inputParams.topology);
 
-    // Main evaluation agorithm
+    // Main evaluation agorithm; MIRCO uses Kokkos::parallel_for() and Kokkos-Kernels
     double meanPressure, effectiveContactAreaFraction;
-    if(!rank)Evaluate(meanPressure, effectiveContactAreaFraction, inputParams, topologyMax, meshgrid);
-
-    const auto finish = std::chrono::high_resolution_clock::now();
-
-    /*std::cout << std::setprecision(16) << "Mean pressure is: " << meanPressure
-              << "\nEffective contact area fraction is: " << effectiveContactAreaFraction
-              << std::endl;*/
-
-    //const double elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(finish - start).count();
-    //std::cout << "Elapsed time is: " + std::to_string(elapsedTime) + "s" << std::endl;
+    if(!rank) Evaluate(meanPressure, effectiveContactAreaFraction, inputParams, topologyMax, meshgrid);
   }
 
-  ///double coupled_scalar = 0.0;
-  ///MPI_Allreduce(&local_micro_value, &coupled_scalar, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
   const auto betweenTime = std::chrono::steady_clock::now();
   
-
+  // Tpetra (with host NO because Tpetra_INST_CUDA=OFF)
   {
     using LO = int;
     using GO = int;
@@ -85,16 +90,14 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
     using execution_space = typename vec_type::execution_space;
     using memory_space = typename device_type::memory_space;
 
-    if (rank == 0) {
-      std::cout << "\n-- Tpetra type information --\n";
+    if (!rank) {
+      std::cout << "-- Tpetra type information --\n";
       std::cout << "vec_type::node_type        = " << typeid(node_type).name() << '\n';
       std::cout << "vec_type::device_type      = " << typeid(device_type).name() << '\n';
       std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
       std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
       std::cout << '\n';
     }
-          
-          
 
     auto comm = Teuchos::rcp(
       new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
@@ -105,39 +108,13 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
 
     auto map = Teuchos::rcp(new map_type(global_num_rows, local_num_rows, 0, comm));
     vec_type x(map);
-/*
-    x.putScalar(coupled_scalar);
-
-    auto x_host = x.getLocalViewHost(Tpetra::Access::ReadOnly);
-
-    double local_tpetra_sum = 0.0;
-    for (size_t i = 0; i < static_cast<size_t>(x.getLocalLength()); ++i) {
-      local_tpetra_sum += x_host(i, 0);
-    }
-
-    double global_tpetra_sum = 0.0;
-    Teuchos::reduceAll(
-      *comm,
-      Teuchos::REDUCE_SUM,
-      1,
-      &local_tpetra_sum,
-      &global_tpetra_sum);
-
-    if (rank == 0) {
-      std::cout << "DefaultExecutionSpace = "
-                << Kokkos::DefaultExecutionSpace::name() << '\n';
-      std::cout << "coupled_scalar = " << coupled_scalar << '\n';
-      std::cout << "global_tpetra_sum = " << global_tpetra_sum << '\n';
-    }
-  }
-    */
   }
   
   #ifdef use_ryml
   {
     ryml::ConstNodeRef inputRoot;
     {
-      std::string inputFileName = "/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/input/in1.yaml";
+      std::string inputFileName = "../testTrilinosKokkos/input/in1.yaml";
       std::ifstream fin(inputFileName);
       if (!fin) throw std::runtime_error("Cannot open input file: " + inputFileName);
       std::stringstream ss;
@@ -153,8 +130,6 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
     }
   }
   #endif
-  
-  
   
   const double t =
       std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();

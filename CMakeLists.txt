@@ -13,30 +13,6 @@ find_package(Trilinos REQUIRED COMPONENTS Kokkos Tpetra)
 
 find_package(mirco_lib CONFIG REQUIRED HINTS ${MIRCO_PATH})
 
-
-
-# DISABLE ALL WARNINGS
-if(true)
-  if(MSVC)
-    add_compile_options(
-      $<$<COMPILE_LANGUAGE:C>:/w>
-      $<$<COMPILE_LANGUAGE:CXX>:/w>
-    )
-  else()
-    add_compile_options(
-      $<$<COMPILE_LANGUAGE:C>:-w>
-      $<$<COMPILE_LANGUAGE:CXX>:-w>
-    )
-  endif()
-
-  if(Kokkos_ENABLE_CUDA)
-    add_compile_options(
-      $<$<COMPILE_LANGUAGE:CUDA>:-w>
-      $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-w>
-    )
-  endif()
-endif()
-
 message(STATUS "Fetching rapidyaml...")
 include(FetchContent)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "" FORCE) # Suppress developer warnings from ryml=
@@ -47,17 +23,10 @@ FetchContent_Declare(rapidyaml
 FetchContent_MakeAvailable(rapidyaml)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF CACHE BOOL "" FORCE)
 
-add_library(use_ryml
-  src/use_ryml.cpp
-  )
-target_link_libraries(use_ryml PUBLIC ryml)
-
-
-
 add_library(MPI_TpetraSerial_KokkosCuda
   src/MPI_TpetraSerial_KokkosCuda.cpp
   )
-target_link_libraries(MPI_TpetraSerial_KokkosCuda PRIVATE mirco::mirco_lib PUBLIC Trilinos::all_selected_libs use_ryml)
+target_link_libraries(MPI_TpetraSerial_KokkosCuda PRIVATE mirco::mirco_lib PUBLIC Trilinos::all_selected_libs ryml)
 
 
 
@@ -89,7 +58,7 @@ if(false)#Kokkos_ENABLE_CUDA)
 else()
   add_executable(exe src/main.cpp)
 endif()
-target_link_libraries(exe PRIVATE MPI_TpetraSerial_KokkosCuda)
+target_link_libraries(exe PRIVATE MPI_TpetraSerial_KokkosCuda ryml)
 
 add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)
 target_link_libraries(exe_nvcc_fails PRIVATE Trilinos::all_selected_libs)#Tpetra)
