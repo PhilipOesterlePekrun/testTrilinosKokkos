@@ -44,14 +44,14 @@ FetchContent_MakeAvailable(rapidyaml)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF CACHE BOOL "" FORCE)
 
 
-add_library(MPI_TpetraSerial_KokkosCuda
-  src/MPI_TpetraSerial_KokkosCuda.cpp
+add_library(MPI_TpetraSerial_Kokkos_d
+  src/MPI_TpetraSerial_Kokkos_d.cpp
   )
-target_link_libraries(MPI_TpetraSerial_KokkosCuda PUBLIC Trilinos::all_selected_libs ryml)
+target_link_libraries(MPI_TpetraSerial_Kokkos_d PUBLIC Trilinos::all_selected_libs ryml)
 
 
 add_executable(exe src/main.cpp)
-target_link_libraries(exe PRIVATE MPI_TpetraSerial_KokkosCuda)
+target_link_libraries(exe PRIVATE MPI_TpetraSerial_Kokkos_d)
 
 find_package(Tpetra REQUIRED)
 add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)

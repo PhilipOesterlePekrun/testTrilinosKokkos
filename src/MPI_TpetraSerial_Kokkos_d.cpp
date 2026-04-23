@@ -36,7 +36,7 @@ T rget(ryml::ConstNodeRef node, c4::csubstr key)
 }
 #endif
 
-int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
+int MPI_TpetraSerial_Kokkos_d(int argc, char* argv[])
 {
   const auto startTime = std::chrono::steady_clock::now();
   
@@ -160,8 +160,8 @@ int MPI_TpetraSerial_KokkosCuda(int argc, char* argv[])
       std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
 
   if (!rank) {
-    std::cout << "\nMPI_TpetraSerial_KokkosCuda betweenTime: " << std::chrono::duration<double>(betweenTime - startTime).count() << " s\n";
-    std::cout << "MPI_TpetraSerial_KokkosCuda total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
+    std::cout << "\nMPI_TpetraSerial_Kokkos_d betweenTime: " << std::chrono::duration<double>(betweenTime - startTime).count() << " s\n";
+    std::cout << "MPI_TpetraSerial_Kokkos_d total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
   }
 
   return 0;

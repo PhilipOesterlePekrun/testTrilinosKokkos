@@ -5,7 +5,7 @@
 #include <chrono>
 #include <iostream>
 
-#include "MPI_TpetraSerial_KokkosCuda.h"
+#include "MPI_TpetraSerial_Kokkos_d.h"
 
 int main(int argc, char* argv[])
 {
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    MPI_TpetraSerial_KokkosCuda(argc, argv);
+    MPI_TpetraSerial_Kokkos_d(argc, argv);
   }
   
   const double t =

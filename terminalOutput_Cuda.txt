@@ -1,0 +1,80 @@
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake .
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (0.5s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+[ 65%] Linking CXX executable exe
+[ 65%] Built target exe
+[ 68%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp: In function ‘consteval auto breaks_nvcc()’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: error: parse error in template argument list
+   26 |     std::array left = breaks_nvcc<shape[0], shape[1]>();
+      |                   ^~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: error: parameter packs not expanded with ‘...’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: note:         ‘n’
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:43: error: expected ‘,’ or ‘;’ before ‘[’ token
+   26 |     std::array left = breaks_nvcc<shape[0], shape[1]>();
+      |                                           ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: error: parse error in template argument list
+   27 |     std::array right = breaks_nvcc<shape[2], shape[3]>();
+      |                    ^~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: error: parameter packs not expanded with ‘...’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: note:         ‘n’
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:44: error: expected ‘,’ or ‘;’ before ‘[’ token
+   27 |     std::array right = breaks_nvcc<shape[2], shape[3]>();
+      |                                            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:29:54: error: template argument 2 is invalid
+   29 |     std::array<std::size_t, left.size() * right.size()> out{};
+      |                                                      ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp: In function ‘int main(int, char**)’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:92:59: error: ‘consteval auto breaks_nvcc() [with long unsigned int ...n = {3, 3, 3, 3}]’ called in a constant expression
+   92 |       constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ 
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:12:1: note: ‘consteval auto breaks_nvcc() [with long unsigned int ...n = {3, 3, 3, 3}]’ is not usable as a ‘constexpr’ function because:
+   12 | consteval auto breaks_nvcc()
+      | ^~~~~~~~~~~
+make[2]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mpirun -n 4 ./exe
+-- Kokkos information --
+Threads in use: 233472
+Default execution space: N6Kokkos4CudaE
+Default host execution space: N6Kokkos6SerialE
+Default memory space: N6Kokkos9CudaSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = 1
+
+Kokkos work (rank=0): X_h(n/2)=0
+
+Kokkos work (rank=1): X_h(n/2)=10
+
+Kokkos work (rank=2): X_h(n/2)=20
+
+Kokkos work (rank=3): X_h(n/2)=30
+
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6SerialE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Tpetra work: x.norm2() = 56568.5
+
+RYML: bool1=1
+
+MPI_TpetraSerial_Kokkos_d betweenTime: 2.96556 s
+MPI_TpetraSerial_Kokkos_d total wall time: 4.09768 s
+Total wall time: 4.91692 s

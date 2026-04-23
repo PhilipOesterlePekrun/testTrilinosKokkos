@@ -1,5 +1,3 @@
-#include "nvcc_fails_to_compile.h"
-
 #include <Tpetra_Core.hpp>
 #include <Tpetra_Map.hpp>
 #include <Tpetra_Vector.hpp>
@@ -38,76 +36,60 @@ consteval auto breaks_nvcc()
 
 int main(int argc, char* argv[])
 {
-  
-  const auto startTime = std::chrono::steady_clock::now();
-  
-  int rank = 0, size = 1;
+  Tpetra::ScopeGuard scope(&argc, &argv);
   {
-    MPI_Init(&argc, &argv);
-    struct CleanUpMPI
-    {
-      ~CleanUpMPI() { MPI_Finalize(); }
-    } cleanup_mpi;
-
-    Kokkos::ScopeGuard kokkos_guard(argc, argv);
+    const auto startTime = std::chrono::steady_clock::now();
     
-    ////////////////////////////////////////////
-    {
-      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-      MPI_Comm_size(MPI_COMM_WORLD, &size);
+    auto comm = Tpetra::getDefaultComm();
+    int rank = comm->getRank();
+    int size = comm->getSize();
+  
+    using LO = int;
+    using GO = int;
+    using map_type = Tpetra::Map<LO, GO>;
+    using vec_type = Tpetra::Vector<double, LO, GO>;
+      
+      
+          
+    using node_type = typename vec_type::node_type;
+    using device_type = typename vec_type::device_type;
+    using execution_space = typename vec_type::execution_space;
+    using memory_space = typename device_type::memory_space;
+
+    if (!rank) {
+      std::cout << "-- Tpetra type information --\n";
+      std::cout << "vec_type::node_type        = " << typeid(node_type).name() << '\n';
+      std::cout << "vec_type::device_type      = " << typeid(device_type).name() << '\n';
+      std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
+      std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
+      std::cout << '\n';
+    }
+
+    const LO local_num_rows = 200000000;
+    auto map = Teuchos::rcp(
+      new map_type(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(),
+        local_num_rows, 0, comm));
+
+    vec_type x(map);
+
+    x.putScalar(1.0);
+    x.scale(2.0);
+    auto xNorm = x.norm2();
     
-      using LO = int;
-      using GO = int;
-      using map_type = Tpetra::Map<LO, GO>;
-      using vec_type = Tpetra::Vector<double, LO, GO>;
-        
-        
-            
-      using node_type = typename vec_type::node_type;
-      using device_type = typename vec_type::device_type;
-      using execution_space = typename vec_type::execution_space;
-      using memory_space = typename device_type::memory_space;
-
-      if (!rank) {
-        std::cout << "-- Tpetra type information --\n";
-        std::cout << "vec_type::node_type        = " << typeid(node_type).name() << '\n';
-        std::cout << "vec_type::device_type      = " << typeid(device_type).name() << '\n';
-        std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
-        std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
-        std::cout << '\n';
-      }
-
-      auto comm = Teuchos::rcp(
-      new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
-
-      const LO local_num_rows = 200000000;
-      auto map = Teuchos::rcp(
-        new map_type(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(),
-          local_num_rows, 0, comm));
-
-      vec_type x(map);
-
-      x.putScalar(1.0);
-      x.scale(2.0);
-      auto xNorm = x.norm2();
-      
-      constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
-      
-      if (!rank) {
-        std::cout << "nvcc_fails_to_compile work:\n";
-        std::cout << "x.norm2() = " << xNorm << "\n";
-        std::cout << "trigger[0] = "<< trigger[0] << "\n\n";
-      }
-      
+    constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
+    
+    if (!rank) {
+      std::cout << "nvcc_fails_to_compile work:\n";
+      std::cout << "x.norm2() = " << xNorm << "\n";
+      std::cout << "trigger[0] = "<< trigger[0] << "\n\n";
+    }
+    
+    const double t =
+    std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
+    if (!rank) {
+      std::cout << "Total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
     }
   }
   
-  const double t =
-      std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count();
-
-  if (!rank) {
-    std::cout << "Total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
-  }
-
   return 0;
 }

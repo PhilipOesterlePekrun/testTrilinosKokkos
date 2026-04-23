@@ -1,0 +1,62 @@
+oesterle@node36:~/rd/testTrilinosKokkos_Base/build_openmp$ cmake .
+-- Enabled Kokkos devices: OPENMP;SERIAL
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_openmp/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (0.4s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_openmp
+oesterle@node36:~/rd/testTrilinosKokkos_Base/build_openmp$ make
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+[ 65%] Linking CXX executable exe
+[ 65%] Built target exe
+[ 71%] Built target exe_nvcc_fails
+[100%] Built target c4core
+oesterle@node36:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun -n 4 ./exe
+-- Kokkos information --
+Threads in use: 8
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (rank=0): X_h(n/2)=0
+
+Kokkos work (rank=1): X_h(n/2)=10
+
+Kokkos work (rank=2): X_h(n/2)=20
+
+Kokkos work (rank=3): X_h(n/2)=30
+
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Tpetra work: x.norm2() = 56568.5
+
+RYML: bool1=1
+
+MPI_TpetraSerial_Kokkos_d betweenTime: 25.208 s
+MPI_TpetraSerial_Kokkos_d total wall time: 29.1303 s
+Total wall time: 29.4028 s
+oesterle@node36:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun -n 4 ./exe_nvcc_fails 
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+nvcc_fails_to_compile work:
+x.norm2() = 56568.5
+trigger[0] = 0
+
+Total wall time: 1.68219 s
