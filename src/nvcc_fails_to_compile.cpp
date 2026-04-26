@@ -63,6 +63,10 @@ int main(int argc, char* argv[])
       std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
       std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
       std::cout << '\n';
+      
+      #if defined(__clang__) && defined(__CUDA__)
+      #pragma message("Using Clang CUDA")
+      #endif
     }
 
     const LO local_num_rows = 200000000;

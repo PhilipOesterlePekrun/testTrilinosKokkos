@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+clang=/bin/clang++
+cuda_path="${CUDA_HOME:-/usr/local/cuda}"
+
+compile=0
+arch_seen=0
+args=()
+
+for arg in "$@"; do
+  case "$arg" in
+    -c)
+      compile=1
+      args+=("$arg")
+      ;;
+
+    -extended-lambda|--extended-lambda|--expt-extended-lambda|-expt-extended-lambda)
+      # NVCC-only, Clang CUDA does not need this
+      ;;
+
+    -expt-relaxed-constexpr|--expt-relaxed-constexpr)
+      # NVCC-only, Clang CUDA does not accept this
+      ;;
+
+    -arch=sm_*)
+      args+=("--cuda-gpu-arch=${arg#-arch=}")
+      arch_seen=1
+      ;;
+
+    -ccbin=*|--compiler-bindir=*)
+      # NVCC-only host compiler selector
+      ;;
+
+    *)
+      args+=("$arg")
+      ;;
+  esac
+done
+
+if [[ "$compile" == "1" ]]; then
+  if [[ "$arch_seen" == "0" ]]; then
+    args=(--cuda-gpu-arch=sm_90 "${args[@]}")
+  fi
+
+  exec "$clang" \
+    -x cuda \
+    --cuda-path="$cuda_path" \
+    -Wno-unknown-cuda-version \
+    "${args[@]}"
+else
+  exec "$clang" \
+    -Wno-unknown-cuda-version \
+    "${args[@]}"
+fi

@@ -1,0 +1,1767 @@
+oesterle@login:~/rd/testTrilinosKokkos_Base$ l
+build_cuda/  build_cuda_NO_TPETRA_INST_CUDA/  build_openmp/  compile_commands.json@  testTrilinosKokkos/
+oesterle@login:~/rd/testTrilinosKokkos_Base$ code ../Trilinos_Base/
+oesterle@login:~/rd/testTrilinosKokkos_Base$ l
+build_cuda/  build_cuda_NO_TPETRA_INST_CUDA/  build_openmp/  compile_commands.json@  testTrilinosKokkos/
+oesterle@login:~/rd/testTrilinosKokkos_Base$ cd build_cuda_NO_TPETRA_INST_CUDA/
+oesterle@login:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=4 --pty bash -l
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
+
+#export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA__CUDA_LANGUAGE/install
+export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+echo $MY_TRILINOS_PATH
+
+#export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper # actually dont do this because we have the kokkos as compile language thing
+export LD_LIBRARY_PATH=${MY_TRILINOS_PATH}/lib:$LD_LIBRARY_PATH
+echo $LD_LIBRARY_PATH
+Lmod has detected the following error:  The following module(s) are unknown: "cuda"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda"
+
+Also make sure that all modulefiles written in TCL start with the string #%Module
+
+
+
+Lmod has detected the following error:  The following module(s) are unknown: "cusolver"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cusolver"
+
+Also make sure that all modulefiles written in TCL start with the string #%Module
+
+
+
+Node: node39
+Activated backend environment:
+  BACKEND_VARIANT=KokkosCuda_cusolver
+  KOKKOS_BACKEND=Cuda
+  BLA_VENDOR=
+  LINALG_ROOT=
+  CUDA_ROOT=
+  MKL_INTERFACE_LAYER=
+  MKL_THREADING_LAYER=
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/opt/openmpi/4.1.8/gcc/lib:/usr/local/cuda/lib64::
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake .
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (0.9s)
+-- Generating done (0.4s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ ninja
+ninja: error: loading 'build.ninja': No such file or directory
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+[ 65%] Linking CXX executable exe
+[ 65%] Built target exe
+[ 68%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp: In function ‘consteval auto breaks_nvcc()’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: error: parse error in template argument list
+   26 |     std::array left = breaks_nvcc<shape[0], shape[1]>();
+      |                   ^~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: error: parameter packs not expanded with ‘...’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: note:         ‘n’
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:43: error: expected ‘,’ or ‘;’ before ‘[’ token
+   26 |     std::array left = breaks_nvcc<shape[0], shape[1]>();
+      |                                           ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: error: parse error in template argument list
+   27 |     std::array right = breaks_nvcc<shape[2], shape[3]>();
+      |                    ^~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: error: parameter packs not expanded with ‘...’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: note:         ‘n’
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:44: error: expected ‘,’ or ‘;’ before ‘[’ token
+   27 |     std::array right = breaks_nvcc<shape[2], shape[3]>();
+      |                                            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:29:54: error: template argument 2 is invalid
+   29 |     std::array<std::size_t, left.size() * right.size()> out{};
+      |                                                      ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp: In function ‘int main(int, char**)’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:79:59: error: ‘consteval auto breaks_nvcc() [with long unsigned int ...n = {3, 3, 3, 3}]’ called in a constant expression
+   79 |     constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   ^ 
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:12:1: note: ‘consteval auto breaks_nvcc() [with long unsigned int ...n = {3, 3, 3, 3}]’ is not usable as a ‘constexpr’ function because:
+   12 | consteval auto breaks_nvcc()
+      | ^~~~~~~~~~~
+make[2]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ rm *
+rm: remove write-protected regular file '_deps/rapidyaml-src/.git/objects/pack/pack-b496440ced4b386219344ae0bd046f9783b4b96a.pack'? ^C
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ rm -rf *
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ echo $LD_LIBRARY_PATH
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/opt/openmpi/4.1.8/gcc/lib:/usr/local/cuda/lib64::
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/openmpi/4.1.8/gcc/bin/mpicxx - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:13 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (6.9s)
+-- Generating done (0.1s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+[ 65%] Linking CXX executable exe
+[ 65%] Built target exe
+[ 68%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp: In function ‘consteval auto breaks_nvcc()’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: error: parse error in template argument list
+   26 |     std::array left = breaks_nvcc<shape[0], shape[1]>();
+      |                   ^~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: error: parameter packs not expanded with ‘...’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:19: note:         ‘n’
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:43: error: expected ‘,’ or ‘;’ before ‘[’ token
+   26 |     std::array left = breaks_nvcc<shape[0], shape[1]>();
+      |                                           ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: error: parse error in template argument list
+   27 |     std::array right = breaks_nvcc<shape[2], shape[3]>();
+      |                    ^~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: error: parameter packs not expanded with ‘...’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:20: note:         ‘n’
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:44: error: expected ‘,’ or ‘;’ before ‘[’ token
+   27 |     std::array right = breaks_nvcc<shape[2], shape[3]>();
+      |                                            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:29:54: error: template argument 2 is invalid
+   29 |     std::array<std::size_t, left.size() * right.size()> out{};
+      |                                                      ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp: In function ‘int main(int, char**)’:
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:79:59: error: ‘consteval auto breaks_nvcc() [with long unsigned int ...n = {3, 3, 3, 3}]’ called in a constant expression
+   79 |     constexpr auto trigger = breaks_nvcc<3, 3, 3, 3>();
+      |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   ^ 
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:12:1: note: ‘consteval auto breaks_nvcc() [with long unsigned int ...n = {3, 3, 3, 3}]’ is not usable as a ‘constexpr’ function because:
+   12 | consteval auto breaks_nvcc()
+      | ^~~~~~~~~~~
+make[2]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ module avail
+
+------------------------------------------------------------------- /home/cluster_tools/modulefiles/core -------------------------------------------------------------------
+   cubit/13.2    cubit/24.8    (D)    openmpi/4.1.8 (L)    paraview/egl-5.13.2     paraview/osmesa-5.13.2 (D)    trilinos/16.1-25-01      trilinos/2025-05
+   cubit/15.2    openmpi/4.0.7        openmpi/5.0.7 (D)    paraview/full-5.13.2    python/2.7.18                 trilinos/16.2-2025-04    trilinos/2025-06 (D)
+
+---------------------------------------------------- /opt/spack/v0.23.1/share/spack/lmod/linux-ubuntu24.04-x86_64/Core -----------------------------------------------------
+   autoconf/2.72-cxeywvn                gcc-runtime/13.3.0-bfhwazu      (L)      libxml2/2.13.4-3phesk4  (D)      qhull/2012.1-yo7jvcy
+   autoconf/2.72-qgkcie5       (D)      gcc-runtime/13.3.0-qanaujm      (D)      m4/1.4.19-izz4zbn                qhull/2012.1-52nebni       (D)
+   automake/1.16.5-hkwh5eb              gcc/9.5.0-pynujrz               (D)      m4/1.4.19-2t4b2pf       (D)      readline/8.2-a6y4mte
+   automake/1.16.5-y3us2lu     (D)      gdbm/1.23-gueshjo                        metis/5.1.0-en2ev56     (L)      readline/8.2-2u6ol7x       (D)
+   berkeley-db/18.1.40-l6f4vsx          gdbm/1.23-3sqctuu               (D)      metis/5.1.0-2zcgytr     (D)      scotch/7.0.4-llbrcmm       (D)
+   berkeley-db/18.1.40-l7fqotk (D)      gettext/0.22.5-jmgsl7w                   mpc/1.1.0-ghn4jfa       (D)      suite-sparse/5.4.0-or2777a
+   bison/3.8.2-vvfrs2l                  gettext/0.22.5-lkmnukg          (D)      mpfr/3.1.6-osnseow      (D)      suite-sparse/5.4.0-42pwar5 (L,D)
+   boost/1.86.0-k6myc2x                 glibc/2.39-a7ispl4              (L)      ncurses/6.5-xe2y2yp     (L)      superlu-dist/7.2.0-q6jgqnd
+   boost/1.86.0-ozobi6e                 glibc/2.39-w3mv3zd              (D)      ncurses/6.5-y7mykbp     (D)      superlu-dist/7.2.0-v53togg (D)
+   boost/1.86.0-sisbljk                 gmake/4.4.1-pdjmeh3                      nghttp2/1.63.0-2g3x3h2  (L,D)    tar/1.34-a2nzi2d
+   boost/1.86.0-4a6n457        (D)      gmake/4.4.1-o3cn2au             (L,D)    openblas/0.3.28-cdvjblw (L,D)    tar/1.34-y25sniq           (D)
+   bzip2/1.0.8-hli2qef                  gmp/6.3.0-e55kmam               (D)      openfoam-org/9-yjq7t3b  (D)      texinfo/7.1-yrybdpu
+   bzip2/1.0.8-zhv5jn7         (D)      hdf5/1.12.2-mh3xlxa                      openmpi/4.1.8-px4orut            xz/5.4.6-kbdp5kx
+   cmake/3.30.5-j6tjzma                 hdf5/1.14.5-hkdxqrz             (D)      openssl/3.4.0-nqffvuf   (L)      xz/5.4.6-z6yb5s5           (D)
+   cmake/3.30.5-tsermhz        (L,D)    help2man/1.49.3-d3eqt3k                  openssl/3.4.0-5fx4muj   (D)      zlib-ng/2.2.1-kch6tjq
+   curl/8.10.1-kphitq4         (L)      libbacktrace/2020-02-19-dy2zmrj          parmetis/4.0.3-kuwpsp2           zlib-ng/2.2.1-rkk5xa3      (L)
+   curl/8.10.1-vqztvhh         (D)      libbacktrace/2020-02-19-wkm423u (D)      parmetis/4.0.3-6eocpcm  (D)      zlib-ng/2.2.1-uxv527f      (D)
+   diffutils/3.10-4in4qic               libiconv/1.17-uwrcb5s           (D)      perl/5.40.0-f236ugq              zoltan/3.901-zhakbvv       (D)
+   diffutils/3.10-6zuqul5      (D)      libsigsegv/2.14-zcf43w2                  perl/5.40.0-2stpxa5              zstd/1.5.6-amlkl3x
+   findutils/4.9.0-y5ig7p7              libsigsegv/2.14-3vobjvk         (D)      pigz/2.8-otrm2ce                 zstd/1.5.6-2nx4s6f         (D)
+   findutils/4.9.0-yzj63r5     (D)      libtool/2.4.7-aq2nryx                    pigz/2.8-xs5z3zl        (D)
+   flex/2.6.4-lkltqbt          (D)      libtool/2.4.7-7pwtixj           (D)      pkgconf/2.2.0-xhhvxdw
+   gawk/5.3.1-c2n6imp                   libxml2/2.13.4-du2dstu                   pkgconf/2.2.0-5vnplby   (D)
+
+--------------------------------------------------- /home/cluster_tools/modulefiles/spack/linux-ubuntu24.04-x86_64/Core ----------------------------------------------------
+   berkeley-db/18.1.40-l6f4vsx        gmp/6.3.0-e55kmam                  libxrandr/1.5.4-zd7k4os               qhull/2012.1-yo7jvcy
+   binutils/2.43.1-22igqq6            hdf5/1.12.2-mh3xlxa                libxrender/0.9.11-k2sbv6a             qhull/2012.1-52nebni
+   boost/1.86.0-k6myc2x               hdf5/1.14.5-hkdxqrz                libxt/1.3.0-pu7homa                   randrproto/1.5.0-nlbg7hg
+   boost/1.86.0-ozobi6e               hwloc/2.11.1-zvy523z               llvm/17.0.6-jokatrr                   readline/8.2-2u6ol7x
+   boost/1.86.0-sisbljk               jsoncpp/1.9.5-mnp4z6w              lua/5.3.6-5grxtrs                     renderproto/0.11.1-xoccwu5
+   boost/1.86.0-4a6n457               kbproto/1.0.7-24ro26p              lz4/1.10.0-rtpgusp                    scotch/7.0.4-llbrcmm
+   bzip2/1.0.8-zhv5jn7                libaec/1.0.6-kgmlzir               matio/1.5.26-nhoxicb                  seacas/2022-10-14-tzuaqxh
+   c-blosc/1.21.5-tafmskf             libbacktrace/2020-02-19-dy2zmrj    mesa/23.3.6-zscalif                   snappy/1.2.1-tse2dgm
+   cgns/4.4.0-3gmam2d                 libbacktrace/2020-02-19-wkm423u    metis/5.1.0-en2ev56                   sqlite/3.46.0-qpb646p
+   cmake/3.30.5-j6tjzma               libbsd/0.12.2-ha4h4g3              metis/5.1.0-2zcgytr                   suite-sparse/5.4.0-or2777a
+   cmake/3.30.5-tsermhz               libedit/3.1-20240808-yoln6fj       mpc/1.1.0-ghn4jfa                     suite-sparse/5.4.0-42pwar5
+   curl/8.10.1-kphitq4                libffi/3.4.6-xuhjy6l               mpfr/3.1.6-osnseow                    superlu-dist/7.2.0-q6jgqnd
+   curl/8.10.1-vqztvhh                libice/1.1.1-cc55c2u               ncurses/6.5-xe2y2yp                   superlu-dist/7.2.0-v53togg
+   double-conversion/3.3.0-ngydbpi    libiconv/1.17-uwrcb5s              netcdf-c/4.9.2-hby44je                swig/4.1.1-uknhyim
+   eigen/3.4.0-zx2f5fe                libjpeg-turbo/3.0.3-v2cesl6        nghttp2/1.63.0-2g3x3h2                unzip/6.0-7k633b4
+   expat/2.6.4-iogrdod                libmd/1.0.4-nrpqib6                nlohmann-json/3.11.3-miw76ul          utf8cpp/2.3.4-jw6acrd
+   flex/2.6.4-lkltqbt                 libogg/1.3.5-6wq3wf7               openblas/0.3.28-cdvjblw               util-linux-uuid/2.40.2-nzis4kv
+   fmt/9.1.0-ylcd2kt                  libpciaccess/0.17-3eazuxc          openfoam-org/9-yjq7t3b                vtk/9.3.1-5fu7vct
+   freetype/2.13.2-f6axxsv            libpng/1.6.39-d56ejmn              openmpi/4.1.8-px4orut                 xextproto/7.3.0-olozj44
+   gcc-runtime/13.3.0-bfhwazu         libpthread-stubs/0.5-5exmusp       openssl/3.4.0-nqffvuf                 xproto/7.0.31-j7asz3m
+   gcc-runtime/13.3.0-qanaujm         libsm/1.2.4-utixd3w                openssl/3.4.0-5fx4muj                 xrandr/1.5.2-mbxvns6
+   gcc/9.5.0-pynujrz                  libtheora/1.1.1-d625jam            parallel-netcdf/1.12.3-2eksxog        xtrans/1.5.2-mnpl6te
+   gdbm/1.23-gueshjo                  libtiff/4.7.0-oq5iumo              parallel/20240822-kfesdrv             xz/5.4.6-z6yb5s5
+   gl2ps/1.4.2-prsopsz                libunwind/1.8.1-dc63alx            parmetis/4.0.3-kuwpsp2                zlib-ng/2.2.1-kch6tjq
+   glew/2.2.0-auotmt6                 libx11/1.8.10-jr6elat              parmetis/4.0.3-6eocpcm                zlib-ng/2.2.1-rkk5xa3
+   glibc/2.39-a7ispl4                 libxau/1.0.11-4gkaz6y              pcre2/10.44-aucbnby                   zlib-ng/2.2.1-uxv527f
+   glibc/2.39-w3mv3zd                 libxcb/1.17.0-y4djtvk              perl/5.40.0-2yvs4ja            (D)    zoltan/3.901-zhakbvv
+   glproto/1.4.17-wkaaqkh             libxdmcp/1.1.5-wqwuaiz             pkgconf/2.2.0-xhhvxdw                 zstd/1.5.6-amlkl3x
+   glx/1.4-ubgz4av                    libxext/1.3.6-m3jq7lr              proj/9.4.1-c5xyomg
+   gmake/4.4.1-o3cn2au                libxml2/2.13.4-whxxupz             pugixml/1.14-2kgmerd
+
+  Where:
+   L:  Module is loaded
+   D:  Default Module
+
+If the avail list is too long consider trying:
+
+"module --default avail" or "ml -d av" to just list the default modules.
+"module overview" or "ml ov" to display the number of modules for each name.
+
+Use "module spider" to find all possible modules and extensions.
+Use "module keyword key1 key2 ..." to search for all possible modules matching any of the "keys".
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ module load llvm/17.0.6-jokatrr
+
+which clang
+which clang++
+clang++ --version
+Lmod Warning: 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+The following dependent module(s) are not currently loaded: gcc-runtime/13.3.0-bfhwazu (required by: nghttp2/1.63.0-2g3x3h2, zlib-ng/2.2.1-rkk5xa3, openssl/3.4.0-nqffvuf,
+curl/8.10.1-kphitq4, gmake/4.4.1-o3cn2au, ncurses/6.5-xe2y2yp, cmake/3.30.5-tsermhz, metis/5.1.0-en2ev56, openblas/0.3.28-cdvjblw, suite-sparse/5.4.0-42pwar5,
+zstd/1.5.6-amlkl3x, xz/5.4.6-z6yb5s5, readline/8.2-2u6ol7x), glibc/2.39-a7ispl4 (required by: nghttp2/1.63.0-2g3x3h2, zlib-ng/2.2.1-rkk5xa3, openssl/3.4.0-nqffvuf,
+curl/8.10.1-kphitq4, gmake/4.4.1-o3cn2au, ncurses/6.5-xe2y2yp, cmake/3.30.5-tsermhz, metis/5.1.0-en2ev56, openblas/0.3.28-cdvjblw, suite-sparse/5.4.0-42pwar5,
+zstd/1.5.6-amlkl3x, xz/5.4.6-z6yb5s5, readline/8.2-2u6ol7x)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+The following have been reloaded with a version change:
+  1) gcc-runtime/13.3.0-bfhwazu => gcc-runtime/13.3.0-qanaujm     2) glibc/2.39-a7ispl4 => glibc/2.39-w3mv3zd
+
+/bin/clang
+/bin/clang++
+Ubuntu clang version 18.1.3 (1ubuntu1)
+Target: x86_64-pc-linux-gnu
+Thread model: posix
+InstalledDir: /bin
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ module purge
+
+module load openmpi/4.1.8
+module load cmake/3.30.5-tsermhz
+module load gmake/4.4.1-o3cn2au
+# plus your usual TPL modules
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ export CC=/bin/clang
+export CXX=/bin/clang++
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ export OMPI_CC=/bin/clang
+export OMPI_CXX=/bin/clang++
+
+export CC=mpicc
+export CXX=mpicxx
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mpicxx --showme:command
+mpicxx --showme:compile
+mpicxx --showme:link
+/bin/clang++
+-I/opt/openmpi/4.1.8/gcc/include -I/opt/openmpi/4.1.8/gcc/include/openmpi
+-L/opt/openmpi/4.1.8/gcc/lib -Wl,-rpath -Wl,/opt/openmpi/4.1.8/gcc/lib -Wl,--enable-new-dtags -lmpi
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ rm -rf *
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
+
+#export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA__CUDA_LANGUAGE/install
+export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+echo $MY_TRILINOS_PATH
+
+#export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper # actually dont do this because we have the kokkos as compile language thing
+export LD_LIBRARY_PATH=${MY_TRILINOS_PATH}/lib:$LD_LIBRARY_PATH
+echo $LD_LIBRARY_PATH
+
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+Lmod has detected the following error:  The following module(s) are unknown: "cuda"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda"
+
+Also make sure that all modulefiles written in TCL start with the string #%Module
+
+
+
+Lmod has detected the following error:  The following module(s) are unknown: "cusolver"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cusolver"
+
+Also make sure that all modulefiles written in TCL start with the string #%Module
+
+
+
+Node: node39
+Activated backend environment:
+  BACKEND_VARIANT=KokkosCuda_cusolver
+  KOKKOS_BACKEND=Cuda
+  BLA_VENDOR=
+  LINALG_ROOT=
+  CUDA_ROOT=
+  MKL_INTERFACE_LAYER=
+  MKL_THREADING_LAYER=
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/opt/openmpi/4.1.8/gcc/lib:/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/usr/local/cuda/lib64::
+-- The CXX compiler identification is Clang 18.1.3
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/openmpi/4.1.8/gcc/bin/mpicxx - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:13 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+make-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (7.1s)
+-- Generating done (0.1s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+[ 65%] Linking CXX executable exe
+[ 65%] Built target exe
+[ 68%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:35: error: expected '>'
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                   ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:30: note: to match this '<'
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                              ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:40: error: expected unqualified-id
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                        ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:39: error: expected ';' at end of declaration
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                       ^
+      |                                       ;
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:44: error: expected variable name or 'this' in lambda capture list
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:36: error: expected '>'
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                    ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:31: note: to match this '<'
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                               ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:41: error: expected unqualified-id
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                         ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:40: error: expected ';' at end of declaration
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                        ^
+      |                                        ;
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:45: error: expected variable name or 'this' in lambda capture list
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                             ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:12: error: variable of non-literal type 'std::array' cannot be defined in a constexpr function before C++23
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:79:26: error: no matching function for call to 'breaks_nvcc'
+   79 | constexpr auto trigger = breaks_nvcc< 3UL, 3UL, 3UL, 3UL> (); 
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:12:1: note: candidate template ignored: substitution failure [with n = <3, 3, 3, 3>]
+   12 | breaks_nvcc() 
+      | ^
+10 errors generated.
+make[2]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mpicxx --showme:command
+mpicxx --showme:compile
+mpicxx --showme:link
+/bin/clang++
+-I/opt/openmpi/4.1.8/gcc/include -I/opt/openmpi/4.1.8/gcc/include/openmpi
+-L/opt/openmpi/4.1.8/gcc/lib -Wl,-rpath -Wl,/opt/openmpi/4.1.8/gcc/lib -Wl,--enable-new-dtags -lmpi
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ export NVCC_WRAPPER_DEFAULT_COMPILER=/bin/clang++
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 48%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp:3:10: fatal error: 'mpi.h' file not found
+    3 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated.
+make[2]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cat > test.cu <<'EOF'
+#include <cstdio>
+
+__global__ void kernel() {
+  printf("hello from cuda\n");
+}
+
+int main() {
+  kernel<<<1,1>>>();
+  cudaDeviceSynchronize();
+}
+EOF
+
+/bin/clang++ test.cu \
+  --cuda-gpu-arch=sm_80 \
+  -std=c++20 \
+  -L/usr/local/cuda/lib64 \
+  -lcudart \
+  -o test_cuda_clang
+clang++: warning: CUDA version is newer than the latest supported version 12.3 [-Wunknown-cuda-version]
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_CXX_COMPILER=/bin/clang++ \
+  -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (0.5s)
+You have changed variables that require your cache to be deleted.
+Configure will be re-run and you may have to reset some variables.
+The following variables have changed:
+CMAKE_CXX_COMPILER= /bin/clang++
+CMAKE_CXX_COMPILER= /bin/clang++
+CMAKE_CXX_COMPILER= /bin/clang++
+
+-- The CXX compiler identification is Clang 18.1.3
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Error at CMakeLists.txt:13 (find_package):
+  By not providing "FindTrilinos.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "Trilinos",
+  but CMake did not find one.
+
+  Could not find a package configuration file provided by "Trilinos" with any
+  of the following names:
+
+    TrilinosConfig.cmake
+    trilinos-config.cmake
+
+  Add the installation prefix of "Trilinos" to CMAKE_PREFIX_PATH or set
+  "Trilinos_DIR" to a directory containing one of the above files.  If
+  "Trilinos" provides a separate development package or SDK, be sure it has
+  been installed.
+
+
+-- Configuring incomplete, errors occurred!
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+#export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA__CUDA_LANGUAGE/install
+export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+echo $MY_TRILINOS_PATH
+
+#export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper # actually dont do this because we have the kokkos as compile language thing
+export LD_LIBRARY_PATH=${MY_TRILINOS_PATH}/lib:$LD_LIBRARY_PATH
+echo $LD_LIBRARY_PATH
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/opt/openmpi/4.1.8/gcc/lib:/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/usr/local/cuda/lib64::
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
+Lmod has detected the following error:  The following module(s) are unknown: "cuda"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda"
+
+Also make sure that all modulefiles written in TCL start with the string #%Module
+
+
+
+Lmod has detected the following error:  The following module(s) are unknown: "cusolver"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cusolver"
+
+Also make sure that all modulefiles written in TCL start with the string #%Module
+
+
+
+Node: node39
+Activated backend environment:
+  BACKEND_VARIANT=KokkosCuda_cusolver
+  KOKKOS_BACKEND=Cuda
+  BLA_VENDOR=
+  LINALG_ROOT=
+  CUDA_ROOT=
+  MKL_INTERFACE_LAYER=
+  MKL_THREADING_LAYER=
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_CXX_COMPILER=/bin/clang++ \
+  -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:13 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (0.5s)
+-- Generating done (0.1s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+    MPI_CXX_COMPILER
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp:3:10: fatal error: 'mpi.h' file not found
+    3 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated.
+make[2]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 48%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp:3:10: fatal error: 'mpi.h' file not found
+    3 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated.
+make[2]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake .
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Found MPI_CXX: /opt/openmpi/4.1.8/gcc/lib/libmpi.so (found version "3.1")
+-- Found MPI: TRUE (found version "3.1") found components: CXX
+-- Configuring done (0.7s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 48%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+[ 65%] Linking CXX executable exe
+[ 65%] Built target exe
+[ 68%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:35: error: expected '>'
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                   ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:30: note: to match this '<'
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                              ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:40: error: expected unqualified-id
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                        ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:39: error: expected ';' at end of declaration
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                       ^
+      |                                       ;
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:44: error: expected variable name or 'this' in lambda capture list
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:36: error: expected '>'
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                    ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:31: note: to match this '<'
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                               ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:41: error: expected unqualified-id
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                         ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:40: error: expected ';' at end of declaration
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                        ^
+      |                                        ;
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:45: error: expected variable name or 'this' in lambda capture list
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                             ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:12: error: variable of non-literal type 'std::array' cannot be defined in a constexpr function before C++23
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:79:26: error: no matching function for call to 'breaks_nvcc'
+   79 | constexpr auto trigger = breaks_nvcc< 3UL, 3UL, 3UL, 3UL> (); 
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:12:1: note: candidate template ignored: substitution failure [with n = <3, 3, 3, 3>]
+   12 | breaks_nvcc() 
+      | ^
+10 errors generated.
+make[2]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mpicxx --showme:compile
+mpicxx --showme:link
+-I/opt/openmpi/4.1.8/gcc/include -I/opt/openmpi/4.1.8/gcc/include/openmpi
+-L/opt/openmpi/4.1.8/gcc/lib -Wl,-rpath -Wl,/opt/openmpi/4.1.8/gcc/lib -Wl,--enable-new-dtags -lmpi
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ grep CMAKE_CXX_COMPILER CMakeCache.txt
+make VERBOSE=1
+CMAKE_CXX_COMPILER:UNINITIALIZED=/bin/clang++
+CMAKE_CXX_COMPILER_AR:FILEPATH=/bin/llvm-ar-18
+CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS:FILEPATH=/bin/clang-scan-deps-18
+CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/bin/llvm-ranlib-18
+//ADVANCED property for variable: CMAKE_CXX_COMPILER
+CMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_CXX_COMPILER_AR
+CMAKE_CXX_COMPILER_AR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS
+CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_CXX_COMPILER_RANLIB
+CMAKE_CXX_COMPILER_RANLIB-ADVANCED:INTERNAL=1
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -S/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos -B/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA --check-build-system CMakeFiles/Makefile.cmake 0
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_progress_start /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[1]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make  -f _deps/rapidyaml-build/CMakeFiles/ryml.dir/build.make _deps/rapidyaml-build/CMakeFiles/ryml.dir/depend
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA && /opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_depends "Unix Makefiles" /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/DependInfo.cmake "--color="
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Dependencies file "_deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build/CMakeFiles/ryml.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target ryml
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make  -f _deps/rapidyaml-build/CMakeFiles/ryml.dir/build.make _deps/rapidyaml-build/CMakeFiles/ryml.dir/build
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/common.cpp
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/node.cpp
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/node_type.cpp
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/parse.cpp
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/preprocess.cpp
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/reference_resolver.cpp
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/tag.cpp
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/tree.cpp
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o -MF CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o.d -o CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src/c4/yml/version.cpp
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o -MF CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o.d -o CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src/c4/base64.cpp
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o -MF CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o.d -o CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src/c4/char_traits.cpp
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o -MF CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o.d -o CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src/c4/error.cpp
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o -MF CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o.d -o CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src/c4/format.cpp
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o -MF CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o.d -o CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src/c4/memory_resource.cpp
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o -MF CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o.d -o CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src/c4/memory_util.cpp
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++  -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -std=c++20 -w -MD -MT _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o -MF CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o.d -o CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src/c4/utf.cpp
+[ 48%] Linking CXX static library libryml.a
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -P CMakeFiles/ryml.dir/cmake_clean_target.cmake
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-build && /opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_link_script CMakeFiles/ryml.dir/link.txt --verbose=1
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/ar qc libryml.a CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/ranlib libryml.a
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[ 54%] Built target ryml
+make  -f CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/depend
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA && /opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_depends "Unix Makefiles" /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/DependInfo.cmake "--color="
+Dependencies file "CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target MPI_TpetraSerial_Kokkos_d
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make  -f CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++ -DKOKKOS_DEPENDENCE -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -isystem /opt/openmpi/4.1.8/gcc/include -isystem /opt/openmpi/4.1.8/gcc/include/openmpi -std=c++20 -w -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90 -MD -MT CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o -MF CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o.d -o CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -P CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/cmake_clean_target.cmake
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_link_script CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/link.txt --verbose=1
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/ar qc libMPI_TpetraSerial_Kokkos_d.a CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/ranlib libMPI_TpetraSerial_Kokkos_d.a
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+make  -f CMakeFiles/exe.dir/build.make CMakeFiles/exe.dir/depend
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA && /opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_depends "Unix Makefiles" /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles/exe.dir/DependInfo.cmake "--color="
+Dependencies file "CMakeFiles/exe.dir/src/main.cpp.o.d" is newer than depends file "/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles/exe.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target exe
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make  -f CMakeFiles/exe.dir/build.make CMakeFiles/exe.dir/build
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++ -DKOKKOS_DEPENDENCE -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -isystem /opt/openmpi/4.1.8/gcc/include -isystem /opt/openmpi/4.1.8/gcc/include/openmpi -std=c++20 -w -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90 -MD -MT CMakeFiles/exe.dir/src/main.cpp.o -MF CMakeFiles/exe.dir/src/main.cpp.o.d -o CMakeFiles/exe.dir/src/main.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/main.cpp
+^[[ 65%] Linking CXX executable exe
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_link_script CMakeFiles/exe.dir/link.txt --verbose=1
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++ -DKOKKOS_DEPENDENCE -arch=sm_90 -Wl,-rpath -Wl,/opt/openmpi/4.1.8/gcc/lib -Wl,--enable-new-dtags CMakeFiles/exe.dir/src/main.cpp.o -o exe  -Wl,-rpath,/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/usr/local/cuda-12.8/targets/x86_64-linux/lib:/opt/openmpi/4.1.8/gcc/lib libMPI_TpetraSerial_Kokkos_d.a /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetraext.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetrainout.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetra.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetraclassic.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkostsqr.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoskernels.so.16.2.0 /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusolver.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusparse.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvJitLink.so /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libepetra.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosremainder.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoskokkoscomm.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoskokkoscompat.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosnumerics.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoscomm.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosparameterlist.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosparser.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoscore.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoscontainers.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkosalgorithms.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoscore.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkossimd.so.4.7.1 /usr/lib/x86_64-linux-gnu/liblapack.so /usr/lib/x86_64-linux-gnu/libblas.so /usr/local/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcudart.so -ldl /usr/lib/x86_64-linux-gnu/librt.a /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublas.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublasLt.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libculibos.a /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufft.so _deps/rapidyaml-build/libryml.a /opt/openmpi/4.1.8/gcc/lib/libmpi.so
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[ 65%] Built target exe
+make  -f CMakeFiles/exe_nvcc_fails.dir/build.make CMakeFiles/exe_nvcc_fails.dir/depend
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA && /opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_depends "Unix Makefiles" /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles/exe_nvcc_fails.dir/DependInfo.cmake "--color="
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make  -f CMakeFiles/exe_nvcc_fails.dir/build.make CMakeFiles/exe_nvcc_fails.dir/build
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[ 68%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/kokkos_launch_compiler /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/bin/nvcc_wrapper /bin/clang++ /bin/clang++ -DKOKKOS_DEPENDENCE -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /opt/openmpi/4.1.8/gcc/include -isystem /opt/openmpi/4.1.8/gcc/include/openmpi -std=c++20 -w -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90 -MD -MT CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o -MF CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o.d -o CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:35: error: expected '>'
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                   ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:30: note: to match this '<'
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                              ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:40: error: expected unqualified-id
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                        ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:39: error: expected ';' at end of declaration
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                       ^
+      |                                       ;
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:44: error: expected variable name or 'this' in lambda capture list
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |                                            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:36: error: expected '>'
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                    ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:31: note: to match this '<'
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                               ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:41: error: expected unqualified-id
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                         ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:40: error: expected ';' at end of declaration
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                        ^
+      |                                        ;
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:27:45: error: expected variable name or 'this' in lambda capture list
+   27 | std::array right = breaks_nvcc< {n}[2], {n}[3]> (); 
+      |                                             ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:26:12: error: variable of non-literal type 'std::array' cannot be defined in a constexpr function before C++23
+   26 | std::array left = breaks_nvcc< {n}[0], {n}[1]> (); 
+      |            ^
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:79:26: error: no matching function for call to 'breaks_nvcc'
+   79 | constexpr auto trigger = breaks_nvcc< 3UL, 3UL, 3UL, 3UL> (); 
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:12:1: note: candidate template ignored: substitution failure [with n = <3, 3, 3, 3>]
+   12 | breaks_nvcc() 
+      | ^
+10 errors generated.
+make[2]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make[1]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make[1]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ [200~
+wme:command
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:command
+^[[201~[200~: command not found
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ export OMPI_CC=/bin/clang
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ export OMPI_CXX=/bin/clang++
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ /opt/openmpi/4.1.8/gcc/bin/mpicc --showme:command
+/bin/clang
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ /opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:command
+/bin/clang++
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ ~
+bash: /home/oesterle: Is a directory
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+export OMPI_CC=/bin/clang
+export OMPI_CXX=/bin/clang++
+/opt/openmpi/4.1.8/gcc/bin/mpicc --showme:command
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:command
+
+/bin/clang
+/bin/clang++
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (1.0s)
+You have changed variables that require your cache to be deleted.
+Configure will be re-run and you may have to reset some variables.
+The following variables have changed:
+CMAKE_CXX_COMPILER= /opt/openmpi/4.1.8/gcc/bin/mpicxx
+CMAKE_CXX_COMPILER= /opt/openmpi/4.1.8/gcc/bin/mpicxx
+CMAKE_CXX_COMPILER= /opt/openmpi/4.1.8/gcc/bin/mpicxx
+
+-- The CXX compiler identification is Clang 18.1.3
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/openmpi/4.1.8/gcc/bin/mpicxx - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Error at CMakeLists.txt:13 (find_package):
+  By not providing "FindTrilinos.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "Trilinos",
+  but CMake did not find one.
+
+  Could not find a package configuration file provided by "Trilinos" with any
+  of the following names:
+
+    TrilinosConfig.cmake
+    trilinos-config.cmake
+
+  Add the installation prefix of "Trilinos" to CMAKE_PREFIX_PATH or set
+  "Trilinos_DIR" to a directory containing one of the above files.  If
+  "Trilinos" provides a separate development package or SDK, be sure it has
+  been installed.
+
+
+-- Configuring incomplete, errors occurred!
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake   -DTRILINOS_PATH=$MY_TRILINOS_PATH   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco"   ../testTrilinosKokkos
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:13 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Found MPI_CXX: /opt/openmpi/4.1.8/gcc/bin/mpicxx (found version "3.1")
+-- Found MPI: TRUE (found version "3.1") found components: CXX
+-- Configuring done (1.0s)
+-- Generating done (0.1s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake   -DTRILINOS_PATH=$MY_TRILINOS_PATH   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco"   ../testTrilinosKokkos
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+^C
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ rm -rf *
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+set_property(TARGET exe_nvcc_fails PROPERTY CXX_COMPILER_LAUNCHER "")
+
+target_compile_features(exe_nvcc_fails PRIVATE cxx_std_20)^C
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake   -DTRILINOS_PATH=$MY_TRILINOS_PATH   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco"   ../testTrilinosKokkos
+-- The CXX compiler identification is Clang 18.1.3
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/openmpi/4.1.8/gcc/bin/mpicxx - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:13 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (7.4s)
+-- Generating done (0.2s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+clang++: error: unknown argument: '-extended-lambda'
+clang++: error: unknown argument: '-expt-relaxed-constexpr'
+clang++: error: unknown argument '-arch=sm_90'; did you mean '-march=sm_90'?
+make[2]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe_nvcc_fails
+[ 50%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+clang++: error: unknown argument: '-extended-lambda'
+clang++: error: unknown argument: '-expt-relaxed-constexpr'
+clang++: error: unknown argument '-arch=sm_90'; did you mean '-march=sm_90'?
+make[3]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:185: CMakeFiles/exe_nvcc_fails.dir/rule] Error 2
+make: *** [Makefile:195: exe_nvcc_fails] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake .
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (0.5s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe_nvcc_fails
+[ 50%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+clang++: error: unknown argument: '-extended-lambda'
+clang++: error: unknown argument: '-expt-relaxed-constexpr'
+clang++: error: unknown argument '-arch=sm_90'; did you mean '-march=sm_90'?
+make[3]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:185: CMakeFiles/exe_nvcc_fails.dir/rule] Error 2
+make: *** [Makefile:195: exe_nvcc_fails] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ rm -rf *
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+
+-- The CXX compiler identification is Clang 18.1.3
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/openmpi/4.1.8/gcc/bin/mpicxx - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:13 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (7.1s)
+-- Generating done (0.1s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+clang++: error: unknown argument: '-extended-lambda'
+clang++: error: unknown argument: '-expt-relaxed-constexpr'
+clang++: error: unknown argument '-arch=sm_90'; did you mean '-march=sm_90'?
+make[2]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ rm -rf *
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ message(STATUS "CMAKE_CXX_COMPILER      = ${CMAKE_CXX_COMPILER}")
+message(STATUS "CMAKE_CXX_COMPILER_ID   = ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "CMAKE_CXX_COMPILER_LAUNCHER = ${CMAKE_CXX_COMPILER_LAUNCHER}")
+message(STATUS "CMAKE_CXX_FLAGS         = ${CMAKE_CXX_FLAGS}")^C
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+-- The CXX compiler identification is Clang 18.1.3
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/openmpi/4.1.8/gcc/bin/mpicxx - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- CMAKE_CXX_COMPILER      = /opt/openmpi/4.1.8/gcc/bin/mpicxx
+-- CMAKE_CXX_COMPILER_ID   = Clang
+-- CMAKE_CXX_COMPILER_VERSION = 18.1.3
+-- CMAKE_CXX_COMPILER_LAUNCHER = 
+-- CMAKE_CXX_FLAGS         = 
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:20 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (7.2s)
+-- Generating done (0.2s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+clang++: error: unknown argument: '-extended-lambda'
+clang++: error: unknown argument: '-expt-relaxed-constexpr'
+clang++: error: unknown argument '-arch=sm_90'; did you mean '-march=sm_90'?
+make[2]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe_nvcc_fails
+[ 50%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+clang++: error: unknown argument: '-extended-lambda'
+clang++: error: unknown argument: '-expt-relaxed-constexpr'
+clang++: error: unknown argument '-arch=sm_90'; did you mean '-march=sm_90'?
+make[3]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:185: CMakeFiles/exe_nvcc_fails.dir/rule] Error 2
+make: *** [Makefile:195: exe_nvcc_fails] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make VERBOSE=1 exe_nvcc_fails
+grep -R -- "-extended-lambda\|-expt-relaxed-constexpr\|-arch=sm_90" . -n
+cat CMakeFiles/exe_nvcc_fails.dir/flags.make
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -S/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos -B/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA --check-build-system CMakeFiles/Makefile.cmake 0
+make  -f CMakeFiles/Makefile2 exe_nvcc_fails
+make[1]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -S/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos -B/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA --check-build-system CMakeFiles/Makefile.cmake 0
+/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_progress_start /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles 2
+make  -f CMakeFiles/Makefile2 CMakeFiles/exe_nvcc_fails.dir/all
+make[2]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make  -f CMakeFiles/exe_nvcc_fails.dir/build.make CMakeFiles/exe_nvcc_fails.dir/depend
+make[3]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+cd /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA && /opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/cmake-3.30.5-tsermhzg5z2kxtonc3akpgsyq42i6jiu/bin/cmake -E cmake_depends "Unix Makefiles" /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/CMakeFiles/exe_nvcc_fails.dir/DependInfo.cmake "--color="
+make[3]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make  -f CMakeFiles/exe_nvcc_fails.dir/build.make CMakeFiles/exe_nvcc_fails.dir/build
+make[3]: Entering directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+[ 50%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+/opt/openmpi/4.1.8/gcc/bin/mpicxx -DKOKKOS_DEPENDENCE -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include -std=c++20 -w -x cuda --cuda-gpu-arch=sm_90 -Wno-unknown-cuda-version -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90 -MD -MT CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o -MF CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o.d -o CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp
+clang++: error: unknown argument: '-extended-lambda'
+clang++: error: unknown argument: '-expt-relaxed-constexpr'
+clang++: error: unknown argument '-arch=sm_90'; did you mean '-march=sm_90'?
+make[3]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[3]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make[2]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make[2]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make[1]: *** [CMakeFiles/Makefile2:185: CMakeFiles/exe_nvcc_fails.dir/rule] Error 2
+make[1]: Leaving directory '/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA'
+make: *** [Makefile:195: exe_nvcc_fails] Error 2
+./compile_commands.json:  "command": "/opt/openmpi/4.1.8/gcc/bin/mpicxx -DKOKKOS_DEPENDENCE -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -std=c++20 -w -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90 -o CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp",
+./compile_commands.json:  "command": "/opt/openmpi/4.1.8/gcc/bin/mpicxx -DKOKKOS_DEPENDENCE -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/src -I/home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core/src -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -std=c++20 -w -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90 -o CMakeFiles/exe.dir/src/main.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/main.cpp",
+./compile_commands.json:  "command": "/opt/openmpi/4.1.8/gcc/bin/mpicxx -DKOKKOS_DEPENDENCE -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include -std=c++20 -w -x cuda --cuda-gpu-arch=sm_90 -Wno-unknown-cuda-version -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90 -o CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o -c /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp",
+./CMakeFiles/exe_nvcc_fails.dir/link.txt:/opt/openmpi/4.1.8/gcc/bin/mpicxx -DKOKKOS_DEPENDENCE -arch=sm_90 CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o -o exe_nvcc_fails  -Wl,-rpath,/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/usr/local/cuda-12.8/targets/x86_64-linux/lib /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetraext.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetrainout.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetra.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetraclassic.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkostsqr.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoskernels.so.16.2.0 /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusolver.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusparse.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvJitLink.so /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libepetra.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosremainder.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoskokkoscomm.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoskokkoscompat.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosnumerics.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoscomm.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosparameterlist.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosparser.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoscore.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoscontainers.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkosalgorithms.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoscore.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkossimd.so.4.7.1 /usr/lib/x86_64-linux-gnu/liblapack.so /usr/lib/x86_64-linux-gnu/libblas.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublas.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublasLt.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libculibos.a /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufft.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcudart.so /usr/local/cuda/targets/x86_64-linux/lib/stubs/libcuda.so -ldl /usr/lib/x86_64-linux-gnu/librt.a
+./CMakeFiles/exe_nvcc_fails.dir/flags.make:CXX_FLAGS = -std=c++20 -w -x cuda --cuda-gpu-arch=sm_90 -Wno-unknown-cuda-version -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90
+./CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/flags.make:CXX_FLAGS = -std=c++20 -w -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90
+./CMakeFiles/exe.dir/link.txt:/opt/openmpi/4.1.8/gcc/bin/mpicxx -DKOKKOS_DEPENDENCE -arch=sm_90 CMakeFiles/exe.dir/src/main.cpp.o -o exe  -Wl,-rpath,/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib:/usr/local/cuda-12.8/targets/x86_64-linux/lib libMPI_TpetraSerial_Kokkos_d.a /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetraext.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetrainout.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetra.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libtpetraclassic.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkostsqr.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoskernels.so.16.2.0 /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusolver.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusparse.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvJitLink.so /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libepetra.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosremainder.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoskokkoscomm.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoskokkoscompat.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosnumerics.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoscomm.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosparameterlist.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchosparser.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libteuchoscore.so.16.2.0 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoscontainers.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkosalgorithms.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkoscore.so.4.7.1 /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/libkokkossimd.so.4.7.1 /usr/lib/x86_64-linux-gnu/liblapack.so /usr/lib/x86_64-linux-gnu/libblas.so /usr/local/cuda/targets/x86_64-linux/lib/stubs/libcuda.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcudart.so -ldl /usr/lib/x86_64-linux-gnu/librt.a /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublas.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublasLt.so /usr/local/cuda-12.8/targets/x86_64-linux/lib/libculibos.a /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufft.so _deps/rapidyaml-build/libryml.a
+./CMakeFiles/exe.dir/flags.make:CXX_FLAGS = -std=c++20 -w -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90
+grep: -n: No such file or directory
+# CMAKE generated file: DO NOT EDIT!
+# Generated by "Unix Makefiles" Generator, CMake Version 3.30
+
+# compile CXX with /opt/openmpi/4.1.8/gcc/bin/mpicxx
+CXX_DEFINES = -DKOKKOS_DEPENDENCE
+
+CXX_INCLUDES = -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include -isystem /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/kokkos -isystem /usr/local/cuda/targets/x86_64-linux/include
+
+CXX_FLAGS = -std=c++20 -w -x cuda --cuda-gpu-arch=sm_90 -Wno-unknown-cuda-version -extended-lambda -Wext-lambda-captures-this -expt-relaxed-constexpr -arch=sm_90
+
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mkdir -p ~/bin
+
+cat > ~/bin/clangcuda++ <<'EOF'
+#!/usr/bin/env bash
+
+clang=/bin/clang++
+cuda_path="${CUDA_HOME:-/usr/local/cuda}"
+
+compile=0
+arch_seen=0
+args=()
+
+for arg in "$@"; do
+  case "$arg" in
+    -c)
+      compile=1
+      args+=("$arg")
+      ;;
+
+    -extended-lambda|--extended-lambda|--expt-extended-lambda|-expt-extended-lambda)
+      # NVCC-only, Clang CUDA does not need this
+      ;;
+
+    -expt-relaxed-constexpr|--expt-relaxed-constexpr)
+chmod +x ~/bin/clangcuda++ion \ "${args[@]}") this
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ rm -rf *
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+cmake \
+  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DCMAKE_C_COMPILER=/bin/clang \
+  -DCMAKE_CXX_COMPILER=$HOME/bin/clangcuda++ \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
+  \
+../testTrilinosKokkos
+-- The CXX compiler identification is Clang 18.1.3
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/oesterle/bin/clangcuda++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- CMAKE_CXX_COMPILER      = /home/oesterle/bin/clangcuda++
+-- CMAKE_CXX_COMPILER_ID   = Clang
+-- CMAKE_CXX_COMPILER_VERSION = 18.1.3
+-- CMAKE_CXX_COMPILER_LAUNCHER = 
+-- CMAKE_CXX_FLAGS         = 
+-- Found CUDAToolkit: /usr/local/cuda/targets/x86_64-linux/include (found version "12.8.93")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Enabled Kokkos devices: SERIAL;CUDA
+CMake Warning at /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfigCommon.cmake:59 (message):
+  The installed Kokkos configuration does not support CXX extensions.
+  Forcing -DCMAKE_CXX_EXTENSIONS=Off
+Call Stack (most recent call first):
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Kokkos/KokkosConfig.cmake:43 (include)
+  /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/lib/cmake/Trilinos/TrilinosConfig.cmake:92 (include)
+  CMakeLists.txt:20 (find_package)
+
+
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+make exe_n              -- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (9.2s)
+-- Generating done (0.1s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    MIRCO_PATH
+
+
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe_nvcc_fails
+[ 50%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+In file included from /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:1:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Tpetra_Core.hpp:22:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Tpetra_ConfigDefs.hpp:57:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_CommHelpers.hpp:14:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_CommUtilities.hpp:13:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_TimeMonitor.hpp:39:
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_Time.hpp:24:10: fatal error: 'mpi.h' file not found
+   24 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated when compiling for sm_90.
+make[3]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:185: CMakeFiles/exe_nvcc_fails.dir/rule] Error 2
+make: *** [Makefile:195: exe_nvcc_fails] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe_nvcc_fails
+[ 50%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+
+In file included from /home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/nvcc_fails_to_compile.cpp:1:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Tpetra_Core.hpp:22:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Tpetra_ConfigDefs.hpp:57:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_CommHelpers.hpp:14:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_CommUtilities.hpp:13:
+In file included from /home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_TimeMonitor.hpp:39:
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install/include/Teuchos_Time.hpp:24:10: fatal error: 'mpi.h' file not found
+   24 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated when compiling for sm_90.
+make[3]: *** [CMakeFiles/exe_nvcc_fails.dir/build.make:76: CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:178: CMakeFiles/exe_nvcc_fails.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:185: CMakeFiles/exe_nvcc_fails.dir/rule] Error 2
+make: *** [Makefile:195: exe_nvcc_fails] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ 
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake   -DTRILINOS_PATH=$MY_TRILINOS_PATH   -DCMAKE_C_COMPILER=/bin/clang   -DCMAKE_CXX_COMPILER=$HOME/bin/clangcuda++   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco"   ../testTrilinosKokkos
+-- CMAKE_CXX_COMPILER      = /home/oesterle/bin/clangcuda++
+-- CMAKE_CXX_COMPILER_ID   = Clang
+-- CMAKE_CXX_COMPILER_VERSION = 18.1.3
+-- CMAKE_CXX_COMPILER_LAUNCHER = 
+-- CMAKE_CXX_FLAGS         = 
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Found MPI_CXX: /opt/openmpi/4.1.8/gcc/lib/libmpi.so (found version "3.1")
+-- Found MPI: TRUE (found version "3.1") found components: CXX
+-- Configuring done (2.0s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe_nvcc_fails
+[ 50%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+[100%] Linking CXX executable exe_nvcc_fails
+[100%] Built target exe_nvcc_fails
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mpirun -n 4 ./exe_nvcc_fails 
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6SerialE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+nvcc_fails_to_compile work:
+x.norm2() = 56568.5
+trigger[0] = 0
+
+Total wall time: 1.19742 s
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make nv^C
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe
+[  4%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[ 13%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 21%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 26%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 30%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 39%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 43%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 47%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 52%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 56%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 60%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 65%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 69%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 73%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 78%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 82%] Linking CXX static library libryml.a
+[ 82%] Built target ryml
+[ 86%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp:3:10: fatal error: 'mpi.h' file not found
+    3 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated when compiling for sm_90.
+make[3]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:159: CMakeFiles/exe.dir/rule] Error 2
+make: *** [Makefile:182: exe] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make exe
+-- CMAKE_CXX_COMPILER      = /home/oesterle/bin/clangcuda++
+-- CMAKE_CXX_COMPILER_ID   = Clang
+-- CMAKE_CXX_COMPILER_VERSION = 18.1.3
+-- CMAKE_CXX_COMPILER_LAUNCHER = 
+-- CMAKE_CXX_FLAGS         = 
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (1.6s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+[  4%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[ 13%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 21%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 26%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 30%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 39%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 43%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 47%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 52%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 56%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 60%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 65%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 69%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 73%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 78%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 82%] Linking CXX static library libryml.a
+[ 82%] Built target ryml
+[ 86%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp:3:10: fatal error: 'mpi.h' file not found
+    3 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated when compiling for sm_90.
+make[3]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[2]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:159: CMakeFiles/exe.dir/rule] Error 2
+make: *** [Makefile:182: exe] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ cmake .
+-- CMAKE_CXX_COMPILER      = /home/oesterle/bin/clangcuda++
+-- CMAKE_CXX_COMPILER_ID   = Clang
+-- CMAKE_CXX_COMPILER_VERSION = 18.1.3
+-- CMAKE_CXX_COMPILER_LAUNCHER = 
+-- CMAKE_CXX_FLAGS         = 
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+ma-- Configuring done (1.6s)
+k-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/src/MPI_TpetraSerial_Kokkos_d.cpp:3:10: fatal error: 'mpi.h' file not found
+    3 | #include <mpi.h>
+      |          ^~~~~~~
+1 error generated when compiling for sm_90.
+make[2]: *** [CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/build.make:76: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ make
+-- CMAKE_CXX_COMPILER      = /home/oesterle/bin/clangcuda++
+-- CMAKE_CXX_COMPILER_ID   = Clang
+-- CMAKE_CXX_COMPILER_VERSION = 18.1.3
+-- CMAKE_CXX_COMPILER_LAUNCHER = 
+-- CMAKE_CXX_FLAGS         = 
+-- Enabled Kokkos devices: SERIAL;CUDA
+-- kokkos_launch_compiler is enabled globally. C++ compiler commands with -DKOKKOS_DEPENDENCE will be redirected to the appropriate compiler for Kokkos
+-- Fetching rapidyaml...
+-- ryml: using C++ standard: C++20
+-- ryml: importing subproject c4core (SUBDIRECTORY)... /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA/_deps/rapidyaml-src/ext/c4core
+-- c4core: using C++ standard: C++20
+-- ryml: -----> target ryml PUBLIC incorporating lib c4core
+-- Configuring done (1.8s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/oesterle/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA
+[  2%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/common.cpp.o
+[  5%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node.cpp.o
+[  8%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/node_type.cpp.o
+[ 11%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/parse.cpp.o
+[ 14%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/preprocess.cpp.o
+[ 17%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/reference_resolver.cpp.o
+[ 20%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tag.cpp.o
+[ 22%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/tree.cpp.o
+[ 25%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/src/c4/yml/version.cpp.o
+[ 28%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/base64.cpp.o
+[ 31%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/char_traits.cpp.o
+[ 34%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/error.cpp.o
+[ 37%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/format.cpp.o
+[ 40%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/language.cpp.o
+[ 42%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_resource.cpp.o
+[ 45%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/memory_util.cpp.o
+[ 48%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/utf.cpp.o
+[ 51%] Building CXX object _deps/rapidyaml-build/CMakeFiles/ryml.dir/ext/c4core/src/c4/version.cpp.o
+[ 54%] Linking CXX static library libryml.a
+[ 54%] Built target ryml
+[ 57%] Building CXX object CMakeFiles/MPI_TpetraSerial_Kokkos_d.dir/src/MPI_TpetraSerial_Kokkos_d.cpp.o
+[ 60%] Linking CXX static library libMPI_TpetraSerial_Kokkos_d.a
+[ 60%] Built target MPI_TpetraSerial_Kokkos_d
+[ 62%] Building CXX object CMakeFiles/exe.dir/src/main.cpp.o
+[ 65%] Linking CXX executable exe
+[ 65%] Built target exe
+[ 68%] Building CXX object CMakeFiles/exe_nvcc_fails.dir/src/nvcc_fails_to_compile.cpp.o
+[ 71%] Linking CXX executable exe_nvcc_fails
+[ 71%] Built target exe_nvcc_fails
+[ 74%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/base64.cpp.o
+[ 77%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/char_traits.cpp.o
+[ 80%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/error.cpp.o
+[ 82%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/format.cpp.o
+[ 85%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/language.cpp.o
+[ 88%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/memory_resource.cpp.o
+[ 91%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/memory_util.cpp.o
+[ 94%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/utf.cpp.o
+[ 97%] Building CXX object _deps/rapidyaml-build/subprojects/c4core/build/CMakeFiles/c4core.dir/src/c4/version.cpp.o
+[100%] Linking CXX static library libc4core.a
+[100%] Built target c4core
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mpirun -n 4 ./exe
+-- Kokkos information --
+Threads in use: 233472
+Default execution space: N6Kokkos4CudaE
+Default host execution space: N6Kokkos6SerialE
+Default memory space: N6Kokkos9CudaSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = 1
+
+Kokkos work (rank=0): X_h(n/2)=0
+
+Kokkos work (rank=1): X_h(n/2)=10
+
+Kokkos work (rank=2): X_h(n/2)=20
+
+Kokkos work (rank=3): X_h(n/2)=30
+
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6SerialE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Tpetra work: x.norm2() = 56568.5
+
+RYML: bool1=1
+
+MPI_TpetraSerial_Kokkos_d betweenTime: 3.04377 s
+MPI_TpetraSerial_Kokkos_d total wall time: 4.16554 s
+Total wall time: 4.95413 s
+oesterle@node39:~/rd/testTrilinosKokkos_Base/build_cuda_NO_TPETRA_INST_CUDA$ mpirun -n 4 ./exe_nvcc_fails 
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6SerialE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+nvcc_fails_to_compile work:
+x.norm2() = 56568.5
+trigger[0] = 0
+
+Total wall time: 1.19503 s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Build Trilinos with preset charon_kserial+cuda_NO_TPETRA_INST_CUDA and just normal g++ for Trilinos

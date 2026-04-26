@@ -47,10 +47,16 @@ echo $LD_LIBRARY_PATH
 
 cmake \
   -DTRILINOS_PATH=$MY_TRILINOS_PATH \
-  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DCMAKE_C_COMPILER=/bin/clang \
+  -DCMAKE_CXX_COMPILER=$HOME/bin/clangcuda++ \
   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
   \
 ../testTrilinosKokkos
+
+
+-DCMAKE_CXX_COMPILER=/bin/clang++ \
+  -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+
 
   -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
 
@@ -60,8 +66,11 @@ cmake \
 
 
 
-
-
+# WITH CLANG:
+export OMPI_CC=/bin/clang
+export OMPI_CXX=/bin/clang++
+/opt/openmpi/4.1.8/gcc/bin/mpicc --showme:command
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:command
 
 
 

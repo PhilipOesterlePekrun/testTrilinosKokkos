@@ -9,9 +9,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
+message(STATUS "CMAKE_CXX_COMPILER      = ${CMAKE_CXX_COMPILER}")
+message(STATUS "CMAKE_CXX_COMPILER_ID   = ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CMAKE_CXX_COMPILER_VERSION = ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "CMAKE_CXX_COMPILER_LAUNCHER = ${CMAKE_CXX_COMPILER_LAUNCHER}")
+message(STATUS "CMAKE_CXX_FLAGS         = ${CMAKE_CXX_FLAGS}")
+
+
 set(CMAKE_PREFIX_PATH ${TRILINOS_PATH} ${CMAKE_PREFIX_PATH})
 find_package(Trilinos REQUIRED COMPONENTS Kokkos Tpetra)
 
+set(CMAKE_CXX_COMPILER_LAUNCHER "" CACHE STRING "" FORCE)
+set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
+set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "")
 
 # DISABLE ALL WARNINGS
 if(MSVC)
@@ -43,11 +53,12 @@ FetchContent_Declare(rapidyaml
 FetchContent_MakeAvailable(rapidyaml)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF CACHE BOOL "" FORCE)
 
+find_package(MPI REQUIRED COMPONENTS CXX)
 
 add_library(MPI_TpetraSerial_Kokkos_d
   src/MPI_TpetraSerial_Kokkos_d.cpp
   )
-target_link_libraries(MPI_TpetraSerial_Kokkos_d PUBLIC Trilinos::all_selected_libs ryml)
+target_link_libraries(MPI_TpetraSerial_Kokkos_d PUBLIC Trilinos::all_selected_libs ryml MPI::MPI_CXX)
 
 
 add_executable(exe src/main.cpp)
@@ -55,4 +66,13 @@ target_link_libraries(exe PRIVATE MPI_TpetraSerial_Kokkos_d)
 
 find_package(Tpetra REQUIRED)
 add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)
-target_link_libraries(exe_nvcc_fails PRIVATE Tpetra::all_libs) # OR Trilinos::all_selected_libs, really does not matter
+
+set_property(TARGET exe_nvcc_fails PROPERTY CXX_COMPILER_LAUNCHER "")
+
+target_compile_options(exe_nvcc_fails PRIVATE
+  -x cuda
+  --cuda-gpu-arch=sm_90
+  -Wno-unknown-cuda-version
+)
+
+target_link_libraries(exe_nvcc_fails PRIVATE Tpetra::all_libs MPI::MPI_CXX) # OR Trilinos::all_selected_libs, really does not matter
