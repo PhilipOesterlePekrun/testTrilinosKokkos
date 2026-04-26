@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+clang=/bin/clang++
+cuda_path="${CUDA_HOME:-/usr/local/cuda}"
+
+compile=0
+cuda_host_only=0
+cuda_device=0
+arch="sm_90"
+
+args=()
+
+for arg in "$@"; do
+  case "$arg" in
+    -c)
+      compile=1
+      args+=("$arg")
+      ;;
+
+    -DFOUR_C_CLANGCUDA_HOST_ONLY)
+      cuda_host_only=1
+      args+=("$arg")
+      ;;
+
+    -DFOUR_C_CLANGCUDA_DEVICE_COMPILE)
+      cuda_device=1
+      args+=("$arg")
+      ;;
+
+    *.cu)
+      cuda_device=1
+      args+=("$arg")
+      ;;
+
+    -extended-lambda|--extended-lambda|--expt-extended-lambda|-expt-extended-lambda)
+      ;;
+
+    -expt-relaxed-constexpr|--expt-relaxed-constexpr)
+      ;;
+
+    -arch=sm_*)
+      arch="${arg#-arch=}"
+      ;;
+
+    --cuda-gpu-arch=sm_*)
+      arch="${arg#--cuda-gpu-arch=}"
+      ;;
+
+    -ccbin=*|--compiler-bindir=*)
+      ;;
+
+    -x)
+      # Drop incoming language override. Wrapper decides.
+      skip_next_x=1
+      ;;
+
+    cuda)
+      if [[ "${skip_next_x:-0}" == "1" ]]; then
+        skip_next_x=0
+      else
+        args+=("$arg")
+      fi
+      ;;
+
+    *)
+      args+=("$arg")
+      ;;
+  esac
+done
+
+if [[ "$compile" == "1" && "$cuda_device" == "1" ]]; then
+  final=(
+    "$clang"
+    -x cuda
+    --cuda-path="$cuda_path"
+    --cuda-gpu-arch="$arch"
+    -Wno-unknown-cuda-version
+    "${args[@]}"
+  )
+elif [[ "$compile" == "1" && "$cuda_host_only" == "1" ]]; then
+  final=(
+    "$clang"
+    -x cuda
+    --cuda-host-only
+    --cuda-path="$cuda_path"
+    --cuda-gpu-arch="$arch"
+    -Wno-unknown-cuda-version
+    "${args[@]}"
+  )
+else
+  final=(
+    "$clang"
+    -Wno-unknown-cuda-version
+    "${args[@]}"
+  )
+fi
+
+if [[ -n "$CLANGCUDA_LOG" ]]; then
+  printf '%q ' "${final[@]}" >> "$CLANGCUDA_LOG"
+  printf '\n' >> "$CLANGCUDA_LOG"
+fi
+
+exec "${final[@]}"

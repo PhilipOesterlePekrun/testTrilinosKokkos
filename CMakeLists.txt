@@ -75,4 +75,4 @@ target_compile_options(exe_nvcc_fails PRIVATE
   -Wno-unknown-cuda-version
 )
 
-target_link_libraries(exe_nvcc_fails PRIVATE Tpetra::all_libs MPI::MPI_CXX) # OR Trilinos::all_selected_libs, really does not matter
+target_link_libraries(exe_nvcc_fails PRIVATE Trilinos::all_selected_libs MPI::MPI_CXX) # OR Trilinos::all_selected_libs, really does not matter

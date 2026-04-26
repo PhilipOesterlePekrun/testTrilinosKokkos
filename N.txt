@@ -73,6 +73,21 @@ export OMPI_CXX=/bin/clang++
 /opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:command
 
 
+# CLANGCUDA++ WRAPPER:
+export OMPI_CC=/bin/clang
+export OMPI_CXX=$HOME/bin/clangcuda++
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:command
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:compile
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:link
+
+export OMPI_CC=/bin/clang
+export OMPI_CXX=/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/clangcuda++2
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:command
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:compile
+/opt/openmpi/4.1.8/gcc/bin/mpicxx --showme:link
+
+
+
 
 mpicc   --showme
 mpicc   --showme:compile
