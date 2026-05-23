@@ -1,3 +1,77 @@
+# NEWEST:{
+  
+## OPENMP:
+cmake \
+  -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp/install \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda/lib/cmake/mirco" \
+../testTrilinosKokkos
+
+## CUDA:
+
+# 64 nproc:
+srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=1 --cpus-per-task=64 --pty bash -l
+
+# 64 mpi ranks:
+srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=64 --cpus-per-task=1 --pty bash -l
+
+
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+echo $MY_TRILINOS_INSTALL
+
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+echo $LD_LIBRARY_PATH
+
+
+export OMPI_CC=/bin/clang
+export OMPI_CXX=/home/oesterle/rd/4C_Base/4C/utilities/clangcuda++
+
+cmake \
+  -DTRILINOS_PATH=${MY_TRILINOS_INSTALL} \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda/lib/cmake/mirco" \
+../testTrilinosKokkos
+
+
+
+srun --exclusive \
+  --constraint=h100 \
+  --partition=h100 \
+  --nodes=2-2 \
+  --ntasks=16 \
+  --ntasks-per-node=8 \
+  --gpus-per-node=1 \
+  --cpus-per-task=1 \
+  --pty bash -l
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
 
 #cmake -G Ninja \
 
@@ -37,22 +111,23 @@ srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=1 --cpus-p
 
 source ~/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments/kCuda.sh
 
-#export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA__CUDA_LANGUAGE/install
-export MY_TRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
-echo $MY_TRILINOS_PATH
+#export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA__CUDA_LANGUAGE/install
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+cuda_NO_TPETRA_INST_CUDA/install
+echo $MY_TRILINOS_INSTALL
 
 #export OMPI_CXX=/home/oesterle/rd/Trilinos_Base/Trilinos/packages/kokkos/bin/nvcc_wrapper # actually dont do this because we have the kokkos as compile language thing
-export LD_LIBRARY_PATH=${MY_TRILINOS_PATH}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
 echo $LD_LIBRARY_PATH
 
 cmake \
-  -DTRILINOS_PATH=$MY_TRILINOS_PATH \
+  -DTRILINOS_PATH=$MY_TRILINOS_INSTALL \
   -DCMAKE_C_COMPILER=/bin/clang \
-  -DCMAKE_CXX_COMPILER=$HOME/bin/clangcuda++ \
+  -DCMAKE_CXX_COMPILER=/home/oesterle/rd/testTrilinosKokkos_Base/testTrilinosKokkos/clangcuda++ \
   -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda_NO_TPETRA_INST_CUDA/lib/cmake/mirco" \
   \
 ../testTrilinosKokkos
 
+  -DCMAKE_CXX_COMPILER=$HOME/bin/clangcuda++ \
 
 -DCMAKE_CXX_COMPILER=/bin/clang++ \
   -DMPI_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \

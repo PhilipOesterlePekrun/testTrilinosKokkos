@@ -8,6 +8,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# A function to set the necessary properties/definitions so a target can be compiled with clangcuda++
+# `compile_mode` can be either CLANGCUDA_MODE_HOST or CLANGCUDA_MODE_DEVICE
+function(configure_clangcuda_target target_name compile_mode)
+  set_target_properties("${target_name}" PROPERTIES
+    CXX_COMPILER_LAUNCHER ""
+    C_COMPILER_LAUNCHER ""
+    CUDA_COMPILER_LAUNCHER ""
+    RULE_LAUNCH_COMPILE ""
+    RULE_LAUNCH_LINK ""
+  )
+
+  target_compile_definitions("${target_name}" PRIVATE
+    ${compile_mode}
+  )
+endfunction()
+
 
 message(STATUS "CMAKE_CXX_COMPILER      = ${CMAKE_CXX_COMPILER}")
 message(STATUS "CMAKE_CXX_COMPILER_ID   = ${CMAKE_CXX_COMPILER_ID}")
@@ -54,25 +70,27 @@ FetchContent_MakeAvailable(rapidyaml)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF CACHE BOOL "" FORCE)
 
 find_package(MPI REQUIRED COMPONENTS CXX)
+find_package(Tpetra REQUIRED)
 
 add_library(MPI_TpetraSerial_Kokkos_d
   src/MPI_TpetraSerial_Kokkos_d.cpp
   )
 target_link_libraries(MPI_TpetraSerial_Kokkos_d PUBLIC Trilinos::all_selected_libs ryml MPI::MPI_CXX)
+configure_clangcuda_target(MPI_TpetraSerial_Kokkos_d CLANGCUDA_MODE_DEVICE)
 
 
 add_executable(exe src/main.cpp)
 target_link_libraries(exe PRIVATE MPI_TpetraSerial_Kokkos_d)
+configure_clangcuda_target(exe CLANGCUDA_MODE_HOST)
 
-find_package(Tpetra REQUIRED)
+
+add_executable(exe_SERIALIZE
+  src/MPI_TpetraSerial_Kokkos_d__SERIALIZE.cpp
+  )
+target_link_libraries(exe_SERIALIZE PUBLIC Trilinos::all_selected_libs MPI::MPI_CXX)
+configure_clangcuda_target(exe_SERIALIZE CLANGCUDA_MODE_DEVICE)
+
 add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)
 
-set_property(TARGET exe_nvcc_fails PROPERTY CXX_COMPILER_LAUNCHER "")
-
-target_compile_options(exe_nvcc_fails PRIVATE
-  -x cuda
-  --cuda-gpu-arch=sm_90
-  -Wno-unknown-cuda-version
-)
-
 target_link_libraries(exe_nvcc_fails PRIVATE Trilinos::all_selected_libs MPI::MPI_CXX) # OR Trilinos::all_selected_libs, really does not matter
+configure_clangcuda_target(exe_nvcc_fails CLANGCUDA_MODE_HOST)
