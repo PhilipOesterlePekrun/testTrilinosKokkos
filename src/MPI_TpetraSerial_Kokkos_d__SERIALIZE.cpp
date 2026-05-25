@@ -36,6 +36,8 @@ int main(int argc, char* argv[])
   
   // Tpetra (with host NO because Tpetra_INST_CUDA=OFF)
   {
+    const auto startTime = std::chrono::steady_clock::now();
+    
     using LO = int;
     using GO = int;
     using map_type = Tpetra::Map<LO, GO>;
@@ -58,7 +60,7 @@ int main(int argc, char* argv[])
     auto comm = Teuchos::rcp(
     new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
 
-    const LO local_num_rows = 200000000;
+    const LO local_num_rows = 20000000;
     auto map = Teuchos::rcp(
       new map_type(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(),
         local_num_rows, 0, comm));
@@ -72,8 +74,17 @@ int main(int argc, char* argv[])
       std::cout << "Tpetra work: ";
       std::cout << "x.norm2() = " << xNorm << "\n\n";
     }
-  }
+    
+    
+    
+    MPI_Barrier(MPI_COMM_WORLD);
   
+    if (!rank) {
+      std::cout << "Tpetra time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
+    }
+    
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
   
   
   
@@ -146,7 +157,8 @@ int main(int argc, char* argv[])
     
     for (int owner = 0; owner < node_size; ++owner) {
       if (node_rank == owner) {
-        const int n = 400000000;
+        /*
+        const int n = 80000000;
         ViewVector_d X_d("X", n);
         Kokkos::deep_copy(X_d, 0);
         Kokkos::parallel_for(
@@ -157,7 +169,80 @@ int main(int argc, char* argv[])
         auto X_h = Kokkos::create_mirror_view_and_copy(ExecSpace_DefaultHost_t(), X_d);
         
         std::cout << "Kokkos work (node_rank="<<node_rank<<"; rank="<<rank<<"): "
-          << "X_h(n/2)="<<X_h(n/2)<<"\n";
+          << "X_h(n/2)="<<X_h(n/2)<<"\n";*/
+          
+        
+        const int n = 8000000;
+        const int num_iters = 20;
+
+        ViewVector_d X_d("X", n);
+        ViewVector_d Y_d("Y", n);
+        ViewVector_d Z_d("Z", n);
+
+        Kokkos::parallel_for(
+          "init",
+          n, KOKKOS_LAMBDA(const int i) {
+            const double a = static_cast<double>((i % 97) + 1);
+            X_d(i) = static_cast<double>(rank) + 0.001 * a;
+            Y_d(i) = 0.002 * a;
+            Z_d(i) = 0.0;
+          });
+
+        for (int iter = 0; iter < num_iters; ++iter) {
+          Kokkos::parallel_for(
+            "stencil_work",
+            n - 2, KOKKOS_LAMBDA(const int j) {
+              const int i = j + 1;
+
+              const double xm = X_d(i - 1);
+              const double xi = X_d(i);
+              const double xp = X_d(i + 1);
+
+              const double lap = xm - 2.0 * xi + xp;
+
+              double v = xi + 0.05 * lap + 0.01 * Y_d(i);
+
+              for (int k = 0; k < 16; ++k) {
+                v = 0.999 * v
+                  + 0.0005 * lap
+                  + 0.0001 * Y_d(i)
+                  + 0.000001 * static_cast<double>(k + 1);
+              }
+
+              Z_d(i) = v;
+            });
+
+          Kokkos::parallel_for(
+            "boundary",
+            2, KOKKOS_LAMBDA(const int i) {
+              if (i == 0) {
+                Z_d(0) = X_d(0);
+              } else {
+                Z_d(n - 1) = X_d(n - 1);
+              }
+            });
+
+          Kokkos::parallel_for(
+            "update",
+            n, KOKKOS_LAMBDA(const int i) {
+              Y_d(i) = 0.95 * Y_d(i) + 0.05 * Z_d(i);
+              X_d(i) = Z_d(i);
+            });
+        }
+
+        double checksum = 0.0;
+        Kokkos::parallel_reduce(
+          "checksum",
+          n, KOKKOS_LAMBDA(const int i, double& local_sum) {
+            local_sum += X_d(i) * X_d(i);
+          },
+          checksum);
+
+        std::cout << "Kokkos work (node_rank="<<node_rank<<"; rank="<<rank<<"): "
+          << "checksum="<<std::sqrt(checksum)<<"\n";
+          
+          
+          
         std::cout << "\tTIME: "<<std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n\n";
       }
       

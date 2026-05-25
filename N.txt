@@ -1,11 +1,167 @@
 # NEWEST:{
   
-## OPENMP:
+## SERIAL:
+
+srun --exclusive --constraint="cascadelake" --partition=cascadelake --ntasks=52 --cpus-per-task=1 --pty bash -l
+srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=64 --cpus-per-task=1 --pty bash -l
+
+
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial_openblasSerial/install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+
+
 cmake \
-  -DTRILINOS_PATH=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp/install \
+  -DTRILINOS_PATH=${MY_TRILINOS_INSTALL} \
   -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
-  -DMIRCO_PATH="/home/oesterle/rd/MIRCO_Base/install_release_tkserial+cuda/lib/cmake/mirco" \
 ../testTrilinosKokkos
+
+mpirun -n 64 ./exe_SERIALIZE
+
+# 4C:
+mpirun -n 64 ./4C /home/oesterle/rd/4C_Base/aux/MIRCO_paper_interface/inputFiles/2d_varying.4C.yaml out
+
+
+
+
+
+
+
+
+
+  
+## OPENMP:
+
+source /home/oesterle/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments_OLD/kOpenMP_obOpenMP.sh
+export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
+
+
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+
+
+export KOKKOS_NUM_THREADS=52
+export OMP_NUM_THREADS=52
+
+
+cmake \
+  -DTRILINOS_PATH=${MY_TRILINOS_INSTALL} \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+../testTrilinosKokkos
+
+mpirun -n 1 ./exe_SERIALIZE
+
+
+
+
+
+
+
+
+srun \
+  --exclusive \
+  --constraint="cascadelake" \
+  --partition=cascadelake \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=52 \
+  --cpu-bind=none \
+  --pty bash -l
+  
+srun \
+  --exclusive \
+  --constraint=h100 \
+  --partition=h100 \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=64 \
+  --cpu-bind=none \
+  --pty bash -l
+
+
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+
+
+export KOKKOS_NUM_THREADS=52
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=spread
+export OMP_PLACES=cores
+export OMP_DYNAMIC=false
+export KOKKOS_PRINT_CONFIGURATION=0 ## FOR RUNTIME OUTPUT FROM KOKKOS SHOWING TOPOLOGY AND SUCH
+
+
+
+# OR
+
+export KOKKOS_NUM_THREADS=52
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=spread
+export OMP_PLACES=cores
+export OMP_DYNAMIC=false
+export OMP_WAIT_POLICY=PASSIVE
+export GOMP_SPINCOUNT=0
+unset KOKKOS_PRINT_CONFIGURATION
+
+export OMPI_MCA_mpi_yield_when_idle=1
+mpirun -np 52 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  --mca mpi_yield_when_idle 1 \
+  ./exe_SERIALIZE
+
+
+
+# OR (on H100 so 64)
+export KOKKOS_NUM_THREADS=64
+export OMP_NUM_THREADS=64
+export OMP_PROC_BIND=spread
+export OMP_PLACES=cores
+export OMP_DYNAMIC=false
+export OMP_WAIT_POLICY=PASSIVE
+export GOMP_SPINCOUNT=0
+unset KOKKOS_PRINT_CONFIGURATION
+
+mpirun \
+  -np 64 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+
+cmake \
+  -DTRILINOS_PATH=${MY_TRILINOS_INSTALL} \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+../testTrilinosKokkos
+
+
+# 4C:
+mpirun \
+  -np 64 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./4C /home/oesterle/rd/4C_Base/aux/MIRCO_paper_interface/inputFiles/2d_varying.4C.yaml out
+
+
+
+
+
+
+
+
+
+
+
 
 ## CUDA:
 
@@ -50,7 +206,7 @@ srun --exclusive \
 
 
 
-
+mpirun -n 64 ./exe_SERIALIZE
 
 
 

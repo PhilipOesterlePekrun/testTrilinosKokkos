@@ -1,0 +1,2530 @@
+salloc: error: Job submit/allocate failed: Requested node configuration is not available
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_openmp$ nproc
+52
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun -n 52 ./exe_SERIALIZE 
+Command 'mpirun' not found, but can be installed with:
+apt install lam-runtime       # version 7.1.4-7, or
+apt install mpich             # version 4.1.2-2
+apt install openmpi-bin       # version 4.1.6-5ubuntu1
+apt install slurm-wlm-torque  # version 23.02.6-1ubuntu2
+Ask your administrator to install one of them.
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_openmp$ l
+CMakeCache.txt  cmake_install.cmake    _deps/  exe_nvcc_fails*  libMPI_TpetraSerial_Kokkos_d.a
+CMakeFiles/     compile_commands.json  exe*    exe_SERIALIZE*   Makefile
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+source /home/oesterle/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments_OLD/kOpenMP_obOpenMP.sh
+export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install/lib:/opt/openmpi/4.1.8/gcc/lib:/usr/local/cuda/lib64::
+Activated backend environment:
+  BACKEND_VARIANT=KokkosOpenMP_openblasOpenMP
+  KOKKOS_BACKEND=OpenMP
+  BLA_VENDOR=OpenBLAS
+  LINALG_ROOT=/home/oesterle/rd/tpl/OpenBLAS_base/install_openmp_thread
+  CUDA_ROOT=
+  MKL_INTERFACE_LAYER=
+  MKL_THREADING_LAYER=
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun -n 52 ./exe_SERIALIZE 
+--------------------------------------------------------------------------
+There are not enough slots available in the system to satisfy the 52
+slots that were requested by the application:
+
+  ./exe_SERIALIZE
+
+Either request fewer slots for your application, or make more slots
+available for use.
+
+A "slot" is the Open MPI term for an allocatable unit where we can
+launch a process.  The number of slots available are defined by the
+environment in which Open MPI processes are run:
+
+  1. Hostfile, via "slots=N" clauses (N defaults to number of
+     processor cores if not provided)
+  2. The --host command line parameter, via a ":N" suffix on the
+     hostname (N defaults to 1 if not provided)
+  3. Resource manager (e.g., SLURM, PBS/Torque, LSF, etc.)
+  4. If none of a hostfile, the --host command line parameter, or an
+     RM is present, Open MPI defaults to the number of processor cores
+
+In all the above cases, if you want Open MPI to default to the number
+of hardware threads instead of the number of processor cores, use the
+--use-hwthread-cpus option.
+
+Alternatively, you can use the --oversubscribe option to ignore the
+number of available slots when deciding the number of processes to
+launch.
+--------------------------------------------------------------------------
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun -n 50 ./exe_SERIALIZE 
+--------------------------------------------------------------------------
+There are not enough slots available in the system to satisfy the 50
+slots that were requested by the application:
+
+  ./exe_SERIALIZE
+
+Either request fewer slots for your application, or make more slots
+available for use.
+
+A "slot" is the Open MPI term for an allocatable unit where we can
+launch a process.  The number of slots available are defined by the
+environment in which Open MPI processes are run:
+
+  1. Hostfile, via "slots=N" clauses (N defaults to number of
+     processor cores if not provided)
+  2. The --host command line parameter, via a ":N" suffix on the
+     hostname (N defaults to 1 if not provided)
+  3. Resource manager (e.g., SLURM, PBS/Torque, LSF, etc.)
+  4. If none of a hostfile, the --host command line parameter, or an
+     RM is present, Open MPI defaults to the number of processor cores
+
+In all the above cases, if you want Open MPI to default to the number
+of hardware threads instead of the number of processor cores, use the
+--use-hwthread-cpus option.
+
+Alternatively, you can use the --oversubscribe option to ignore the
+number of available slots when deciding the number of processes to
+launch.
+--------------------------------------------------------------------------
+oesterle@node40:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+logout
+srun: error: node40: task 0: Exited with exit code 1
+oesterle@login:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+srun \
+  --exclusive \
+  --constraint="cascadelake" \
+  --partition=cascadelake \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=52 \
+  --cpu-bind=none \
+  --pty bash -l
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP//install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+# OR
+export KOKKOS_NUM_THREADS=52
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=spread
+export OMP_PLACES=cores
+export OMP_DYNAMIC=false
+export OMP_WAIT_POLICY=PASSIVE
+export GOMP_SPINCOUNT=0
+unset KOKKOS_PRINT_CONFIGURATION
+
+mpirun \
+  -np 52 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+-- MPI information --
+size: 52
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+
+Tpetra work: x.norm2() = 64498.1
+
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 52
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+^C
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun   -np 52   --bind-to none   --map-by slot:OVERSUBSCRIBE   ./exe_SERIALIZE
+-- MPI information --
+size: 52
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Tpetra work: x.norm2() = 64498.1
+
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 52
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+^Coesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun   -np 52   --bind-to none   --map-by slot:OVERSUBSCRIBE   ./exe_SERIALIZE
+^Coesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ ^C
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ make -j
+[ 27%] Built target c4core
+[ 78%] Built target ryml
+[ 83%] Building CXX object CMakeFiles/exe_SERIALIZE.dir/src/MPI_TpetraSerial_Kokkos_d__SERIALIZE.cpp.o
+[ 86%] Built target exe_nvcc_fails
+[ 91%] Built target MPI_TpetraSerial_Kokkos_d
+[ 97%] Built target exe
+[100%] Linking CXX executable exe_SERIALIZE
+[100%] Built target exe_SERIALIZE
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun   -np 52   --bind-to none   --map-by slot:OVERSUBSCRIBE   ./exe_SERIALIZE
+-- MPI information --
+size: 52
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 52 cores per node.
+                                    Detected: 52 MPI_ranks per node.
+                                    Requested: 52 threads per process.
+Tpetra work: x.norm2() = 64498.1
+
+Tpetra time: 6.58855 s
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 52
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (node_rank=0; rank=0): checksum=171.502
+        TIME: 35.1234 s
+
+Kokkos work (node_rank=1; rank=1): checksum=2395.99
+        TIME: 74.4763 s
+
+Kokkos work (node_rank=2; rank=2): checksum=4637.87
+        TIME: 109.206 s
+
+Kokkos work (node_rank=3; rank=3): checksum=6880.17
+        TIME: 144.22 s
+
+Kokkos work (node_rank=4; rank=4): checksum=9122.58
+        TIME: 182.737 s
+
+Kokkos work (node_rank=5; rank=5): checksum=11365
+        TIME: 219.874 s
+
+Kokkos work (node_rank=6; rank=6): checksum=13607.5
+        TIME: 254.763 s
+
+Kokkos work (node_rank=7; rank=7): checksum=15850
+        TIME: 292.33 s
+
+^Coesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmpsrun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=64 --cpus-per-task=1 --pty bash -l-l
+srun: error: Unable to create step for job 1406632: More processors requested than permitted
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ nproc
+52
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+logout
+oesterle@login:~/rd/testTrilinosKokkos_Base/build_openmp$ srun --exclusive --constraint=h100 --partition=h100 --gpus=1 --ntasks=64 --cpus-per-task=1 --pty bash -l
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+source /home/oesterle/rd/4C_Base/aux/MIRCO_paper_interface/charonEnvironments_OLD/kOpenMP_obOpenMP.sh
+export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
+
+
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install
+/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install/lib:/opt/openmpi/4.1.8/gcc/lib:/usr/local/cuda/lib64::
+Activated backend environment:
+  BACKEND_VARIANT=KokkosOpenMP_openblasOpenMP
+  KOKKOS_BACKEND=OpenMP
+  BLA_VENDOR=OpenBLAS
+  LINALG_ROOT=/home/oesterle/rd/tpl/OpenBLAS_base/install_openmp_thread
+  CUDA_ROOT=
+  MKL_INTERFACE_LAYER=
+  MKL_THREADING_LAYER=
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+export KOKKOS_NUM_THREADS=64
+export OMP_NUM_THREADS=64
+export OMP_PROC_BIND=spread
+export OMP_PLACES=cores
+export OMP_DYNAMIC=false
+export OMP_WAIT_POLICY=PASSIVE
+export GOMP_SPINCOUNT=0
+unset KOKKOS_PRINT_CONFIGURATION
+
+mpirun \
+  -np 64 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+-- MPI information --
+size: 64
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.64
+
+ cores per node.
+                                    Detected:                                     Detected:                                     Detected: 646464 MPI_ranks per node.
+ cores per node.                                    Requested:  cores per node.
+64                                    Detected: 
+ threads per process.                                    Detected: 64
+64 MPI_ranks per node.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+ MPI_ranks per node.
+                                    Requested: 
+64                                    Requested: 64 threads per process.                                    Detected: 
+ threads per process.
+64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+
+                                    Requested: 64 threads per process.                                    Detected: 
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+
+                                    Detected:                                     Detected: 6464 cores per node. cores per node.
+
+                                    Detected:                                     Detected: 6464 MPI_ranks per node. MPI_ranks per node.
+
+                                    Requested:                                     Requested: 6464 threads per process. threads per process.
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.                                    Detected: 64 cores per node.
+
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested:                                     Detected: 64
+ threads per process.64
+ cores per node.                                    Detected: 
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Tpetra work: x.norm2() = 71554.2
+
+Tpetra time: 6.95879 s
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 64
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (node_rank=0; rank=0): checksum=171.502
+        TIME: 20.819 s
+
+^[^[Kokkos work (node_rank=1; rank=1): checksum=2395.99
+        TIME: 41.6093 s
+
+Kokkos work (node_rank=2; rank=2): checksum=4637.87
+        TIME: 62.4264 s
+
+Kokkos work (node_rank=3; rank=3): checksum=6880.17
+        TIME: 83.2969 s
+
+Kokkos work (node_rank=4; rank=4): checksum=9122.58
+        TIME: 104.073 s
+
+Kokkos work (node_rank=5; rank=5): checksum=11365
+        TIME: 124.89 s
+
+Kokkos work (node_rank=6; rank=6): checksum=13607.5
+        TIME: 145.697 s
+
+Kokkos work (node_rank=7; rank=7): checksum=15850
+        TIME: 166.537 s
+
+Kokkos work (node_rank=8; rank=8): checksum=18092.5
+        TIME: 187.384 s
+
+Kokkos work (node_rank=9; rank=9): checksum=20335
+        TIME: 208.211 s
+
+Kokkos work (node_rank=10; rank=10): checksum=22577.5
+        TIME: 229.013 s
+
+Kokkos work (node_rank=11; rank=11): checksum=24820
+        TIME: 250.032 s
+
+Kokkos work (node_rank=12; rank=12): checksum=27062.5
+        TIME: 270.599 s
+
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ $ mpirun   -np 1 --bind-to none   --map-by slot:OVERSUBSCRIBE   ./exe_SERIALIZE
+^C
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+mpirun \
+  -np 64 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+-- MPI information --
+size: 64
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.                                    Detected: 
+64                                    Detected: 
+ cores per node.
+64
+                                    Detected:                                     Detected:  cores per node.6464 MPI_ranks per node.
+                                    Detected: 
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected:  cores per node.64                                    Detected: 
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.                                    Requested: 64
+ cores per node.
+                                    Detected: 6464
+ MPI_ranks per node.                                    Detected:  threads per process.
+                                    Detected: 
+ cores per node.
+                                    Detected: 64                                    Detected: 64                                    Requested: 
+
+64 MPI_ranks per node.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.64                                    Detected:                                     Detected: 64                                    Detected: 64 cores per node.
+ MPI_ranks per node. threads per process.64                                    Requested: 64
+
+
+ cores per node.
+ cores per node.64 MPI_ranks per node.                                    Requested: 64                                    Detected: 
+                                    Detected: 
+ cores per node. threads per process.
+64                                    Detected: 64 cores per node.                                    Detected: 
+
+                                    Requested: 
+64 MPI_ranks per node.
+ threads per process.                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+64 threads per process.
+ MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Tpetra work: x.norm2() = 71554.2
+
+Tpetra time: 6.86147 s
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 64
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (node_rank=0; rank=0): checksum=171.502
+        TIME: 20.7875 s
+
+Kokkos work (node_rank=1; rank=1): checksum=2395.99
+        TIME: 41.624 s
+
+Kokkos work (node_rank=2; rank=2): checksum=4637.87
+        TIME: 62.4118 s
+
+Kokkos work (node_rank=3; rank=3): checksum=6880.17
+        TIME: 83.2084 s
+
+^C
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+logout
+srun: error: node38: task 0: Exited with exit code 1
+oesterle@login:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+srun \
+  --exclusive \
+  --constraint="H100" \
+  --partition=H100 \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=64 \
+  --cpu-bind=none \
+  --pty bash -l
+srun: error: Unable to allocate resources: Invalid feature specification
+oesterle@login:~/rd/testTrilinosKokkos_Base/build_openmp$ sq
+             JOBID    PARTITION                                     NAME         USER ST         TIME        NODES NODELIST(REASON)
+           1406636         h100                                     bash     oesterle  R         9:30            1 node39
+           1406634         h100                                     bash     oesterle  R        11:42            1 node37
+oesterle@login:~/rd/testTrilinosKokkos_Base/build_openmp$ sq
+             JOBID    PARTITION                                     NAME         USER ST         TIME        NODES NODELIST(REASON)
+           1406636         h100                                     bash     oesterle  R         9:31            1 node39
+           1406634         h100                                     bash     oesterle  R        11:43            1 node37
+oesterle@login:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+srun \
+  --exclusive \
+  --constraint=h100 \
+  --partition=h100 \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=64 \
+  --cpu-bind=none \
+  --pty bash -l
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP//install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ 
+# OR (on H100 so 64)
+export KOKKOS_NUM_THREADS=64
+export OMP_NUM_THREADS=64
+export OMP_PROC_BIND=spread
+export OMP_PLACES=cores
+export OMP_DYNAMIC=false
+export OMP_WAIT_POLICY=PASSIVE
+export GOMP_SPINCOUNT=0
+unset KOKKOS_PRINT_CONFIGURATION
+
+mpirun \
+  -np 64 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+-- MPI information --
+size: 64
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Tpetra work: x.norm2() = 71554.2
+
+Tpetra time: 3.89567 s
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 64
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (node_rank=0; rank=0): checksum=171.502
+        TIME: 0.781801 s
+
+Kokkos work (node_rank=1; rank=1): checksum=2395.99
+        TIME: 1.60072 s
+
+Kokkos work (node_rank=2; rank=2): checksum=4637.87
+        TIME: 2.49358 s
+
+Kokkos work (node_rank=3; rank=3): checksum=6880.17
+        TIME: 2.9181 s
+
+Kokkos work (node_rank=4; rank=4): checksum=9122.58
+        TIME: 3.45916 s
+
+Kokkos work (node_rank=5; rank=5): checksum=11365
+        TIME: 4.02316 s
+
+Kokkos work (node_rank=6; rank=6): checksum=13607.5
+        TIME: 4.68615 s
+
+Kokkos work (node_rank=7; rank=7): checksum=15850
+        TIME: 5.3227 s
+
+Kokkos work (node_rank=8; rank=8): checksum=18092.5
+        TIME: 5.86607 s
+
+Kokkos work (node_rank=9; rank=9): checksum=20335
+        TIME: 6.47469 s
+
+Kokkos work (node_rank=10; rank=10): checksum=22577.5
+        TIME: 7.25266 s
+
+Kokkos work (node_rank=11; rank=11): checksum=24820
+        TIME: 7.62 s
+
+Kokkos work (node_rank=12; rank=12): checksum=27062.5
+        TIME: 8.15243 s
+
+Kokkos work (node_rank=13; rank=13): checksum=29305
+        TIME: 8.81368 s
+
+Kokkos work (node_rank=14; rank=14): checksum=31547.5
+        TIME: 9.66697 s
+
+Kokkos work (node_rank=15; rank=15): checksum=33790
+        TIME: 10.294 s
+
+Kokkos work (node_rank=16; rank=16): checksum=36032.5
+        TIME: 10.7951 s
+
+Kokkos work (node_rank=17; rank=17): checksum=38275
+        TIME: 11.3756 s
+
+Kokkos work (node_rank=18; rank=18): checksum=40517.6
+        TIME: 12.242 s
+
+Kokkos work (node_rank=19; rank=19): checksum=42760.1
+        TIME: 12.557 s
+
+Kokkos work (node_rank=20; rank=20): checksum=45002.6
+        TIME: 13.1283 s
+
+Kokkos work (node_rank=21; rank=21): checksum=47245.1
+        TIME: 13.718 s
+
+Kokkos work (node_rank=22; rank=22): checksum=49487.6
+        TIME: 14.2726 s
+
+Kokkos work (node_rank=23; rank=23): checksum=51730.1
+        TIME: 14.87 s
+
+Kokkos work (node_rank=24; rank=24): checksum=53972.6
+        TIME: 15.3923 s
+
+Kokkos work (node_rank=25; rank=25): checksum=56215.2
+        TIME: 16.0671 s
+
+Kokkos work (node_rank=26; rank=26): checksum=58457.7
+        TIME: 16.5665 s
+
+Kokkos work (node_rank=27; rank=27): checksum=60700.2
+        TIME: 17.132 s
+
+Kokkos work (node_rank=28; rank=28): checksum=62942.7
+        TIME: 17.7391 s
+
+Kokkos work (node_rank=29; rank=29): checksum=65185.2
+        TIME: 18.5353 s
+
+Kokkos work (node_rank=30; rank=30): checksum=67427.7
+        TIME: 19.1474 s
+
+Kokkos work (node_rank=31; rank=31): checksum=69670.2
+        TIME: 19.4389 s
+
+Kokkos work (node_rank=32; rank=32): checksum=71912.8
+        TIME: 20.0056 s
+
+Kokkos work (node_rank=33; rank=33): checksum=74155.3
+        TIME: 20.6029 s
+
+Kokkos work (node_rank=34; rank=34): checksum=76397.8
+        TIME: 21.453 s
+
+Kokkos work (node_rank=35; rank=35): checksum=78640.3
+        TIME: 21.7683 s
+
+Kokkos work (node_rank=36; rank=36): checksum=80882.8
+        TIME: 22.3406 s
+
+Kokkos work (node_rank=37; rank=37): checksum=83125.3
+        TIME: 23.1912 s
+
+Kokkos work (node_rank=38; rank=38): checksum=85367.9
+        TIME: 23.4771 s
+
+Kokkos work (node_rank=39; rank=39): checksum=87610.4
+        TIME: 24.0606 s
+
+Kokkos work (node_rank=40; rank=40): checksum=89852.9
+        TIME: 24.6333 s
+
+Kokkos work (node_rank=41; rank=41): checksum=92095.4
+        TIME: 25.2256 s
+
+Kokkos work (node_rank=42; rank=42): checksum=94337.9
+        TIME: 25.8228 s
+
+Kokkos work (node_rank=43; rank=43): checksum=96580.4
+        TIME: 26.6432 s
+
+Kokkos work (node_rank=44; rank=44): checksum=98823
+        TIME: 26.9299 s
+
+Kokkos work (node_rank=45; rank=45): checksum=101065
+        TIME: 27.5333 s
+
+Kokkos work (node_rank=46; rank=46): checksum=103308
+        TIME: 28.1368 s
+
+Kokkos work (node_rank=47; rank=47): checksum=105551
+        TIME: 28.6791 s
+
+Kokkos work (node_rank=48; rank=48): checksum=107793
+        TIME: 29.244 s
+
+Kokkos work (node_rank=49; rank=49): checksum=110036
+        TIME: 29.8205 s
+
+Kokkos work (node_rank=50; rank=50): checksum=112278
+        TIME: 30.6726 s
+
+Kokkos work (node_rank=51; rank=51): checksum=114521
+        TIME: 30.9807 s
+
+Kokkos work (node_rank=52; rank=52): checksum=116763
+        TIME: 31.7962 s
+
+Kokkos work (node_rank=53; rank=53): checksum=119006
+        TIME: 32.393 s
+
+Kokkos work (node_rank=54; rank=54): checksum=121248
+        TIME: 32.7889 s
+
+Kokkos work (node_rank=55; rank=55): checksum=123491
+        TIME: 33.5474 s
+
+Kokkos work (node_rank=56; rank=56): checksum=125733
+        TIME: 33.8793 s
+
+Kokkos work (node_rank=57; rank=57): checksum=127976
+        TIME: 35.1558 s
+
+Kokkos work (node_rank=58; rank=58): checksum=130218
+        TIME: 35.5199 s
+
+Kokkos work (node_rank=59; rank=59): checksum=132461
+        TIME: 36.0922 s
+
+Kokkos work (node_rank=60; rank=60): checksum=134703
+        TIME: 36.6138 s
+
+Kokkos work (node_rank=61; rank=61): checksum=136946
+        TIME: 37.2291 s
+
+Kokkos work (node_rank=62; rank=62): checksum=139188
+        TIME: 37.7915 s
+
+Kokkos work (node_rank=63; rank=63): checksum=141431
+        TIME: 38.3597 s
+
+MPI_TpetraSerial_Kokkos_d__SERIALIZE total wall time: 38.3414 s
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp$ mpirun   -np 64   --bind-to none   --map-by slot:OVERSUBSCRIBE   ./exe_SERIALIZE
+-- MPI information --
+size: 64
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6OpenMPENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6OpenMPENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6OpenMPE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 64 cores per node.
+                                    Detected: 64 MPI_ranks per node.
+                                    Requested: 64 threads per process.
+Tpetra work: x.norm2() = 71554.2
+
+Tpetra time: 3.99371 s
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 64
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (node_rank=0; rank=0): checksum=171.502
+        TIME: 0.807212 s
+
+Kokkos work (node_rank=1; rank=1): checksum=2395.99
+        TIME: 1.55332 s
+
+Kokkos work (node_rank=2; rank=2): checksum=4637.87
+        TIME: 2.26644 s
+
+Kokkos work (node_rank=3; rank=3): checksum=6880.17
+        TIME: 2.84296 s
+
+Kokkos work (node_rank=4; rank=4): checksum=9122.58
+        TIME: 3.38652 s
+
+Kokkos work (node_rank=5; rank=5): checksum=11365
+        TIME: 3.94161 s
+
+Kokkos work (node_rank=6; rank=6): checksum=13607.5
+        TIME: 4.56939 s
+
+Kokkos work (node_rank=7; rank=7): checksum=15850
+        TIME: 5.09442 s
+
+Kokkos work (node_rank=8; rank=8): checksum=18092.5
+        TIME: 5.66677 s
+
+Kokkos work (node_rank=9; rank=9): checksum=20335
+        TIME: 6.23375 s
+
+Kokkos work (node_rank=10; rank=10): checksum=22577.5
+        TIME: 6.85965 s
+
+Kokkos work (node_rank=11; rank=11): checksum=24820
+        TIME: 7.42731 s
+
+Kokkos work (node_rank=12; rank=12): checksum=27062.5
+        TIME: 8.05371 s
+
+Kokkos work (node_rank=13; rank=13): checksum=29305
+        TIME: 8.56421 s
+
+Kokkos work (node_rank=14; rank=14): checksum=31547.5
+        TIME: 9.40369 s
+
+Kokkos work (node_rank=15; rank=15): checksum=33790
+        TIME: 9.72733 s
+
+Kokkos work (node_rank=16; rank=16): checksum=36032.5
+        TIME: 10.2915 s
+
+Kokkos work (node_rank=17; rank=17): checksum=38275
+        TIME: 10.8605 s
+
+Kokkos work (node_rank=18; rank=18): checksum=40517.6
+        TIME: 11.5038 s
+
+Kokkos work (node_rank=19; rank=19): checksum=42760.1
+        TIME: 12.0711 s
+
+Kokkos work (node_rank=20; rank=20): checksum=45002.6
+        TIME: 12.8245 s
+
+Kokkos work (node_rank=21; rank=21): checksum=47245.1
+        TIME: 13.1779 s
+
+Kokkos work (node_rank=22; rank=22): checksum=49487.6
+        TIME: 13.7859 s
+
+Kokkos work (node_rank=23; rank=23): checksum=51730.1
+        TIME: 14.3096 s
+
+Kokkos work (node_rank=24; rank=24): checksum=53972.6
+        TIME: 14.8906 s
+
+Kokkos work (node_rank=25; rank=25): checksum=56215.2
+        TIME: 15.464 s
+
+Kokkos work (node_rank=26; rank=26): checksum=58457.7
+        TIME: 16.3313 s
+
+Kokkos work (node_rank=27; rank=27): checksum=60700.2
+        TIME: 16.6528 s
+
+Kokkos work (node_rank=28; rank=28): checksum=62942.7
+        TIME: 17.268 s
+
+Kokkos work (node_rank=29; rank=29): checksum=65185.2
+        TIME: 17.7834 s
+
+Kokkos work (node_rank=30; rank=30): checksum=67427.7
+        TIME: 18.4014 s
+
+Kokkos work (node_rank=31; rank=31): checksum=69670.2
+        TIME: 18.9621 s
+
+Kokkos work (node_rank=32; rank=32): checksum=71912.8
+        TIME: 19.5186 s
+
+Kokkos work (node_rank=33; rank=33): checksum=74155.3
+        TIME: 20.1113 s
+
+Kokkos work (node_rank=34; rank=34): checksum=76397.8
+        TIME: 20.6801 s
+
+Kokkos work (node_rank=35; rank=35): checksum=78640.3
+        TIME: 21.2476 s
+
+Kokkos work (node_rank=36; rank=36): checksum=80882.8
+        TIME: 21.8709 s
+
+Kokkos work (node_rank=37; rank=37): checksum=83125.3
+        TIME: 22.3997 s
+
+Kokkos work (node_rank=38; rank=38): checksum=85367.9
+        TIME: 23.0202 s
+
+Kokkos work (node_rank=39; rank=39): checksum=87610.4
+        TIME: 23.5644 s
+
+Kokkos work (node_rank=40; rank=40): checksum=89852.9
+        TIME: 24.1412 s
+
+Kokkos work (node_rank=41; rank=41): checksum=92095.4
+        TIME: 24.714 s
+
+Kokkos work (node_rank=42; rank=42): checksum=94337.9
+        TIME: 25.3204 s
+
+Kokkos work (node_rank=43; rank=43): checksum=96580.4
+        TIME: 26.1606 s
+
+Kokkos work (node_rank=44; rank=44): checksum=98823
+        TIME: 26.7486 s
+
+Kokkos work (node_rank=45; rank=45): checksum=101065
+        TIME: 27.1043 s
+
+Kokkos work (node_rank=46; rank=46): checksum=103308
+        TIME: 27.9148 s
+
+Kokkos work (node_rank=47; rank=47): checksum=105551
+        TIME: 28.4382 s
+
+Kokkos work (node_rank=48; rank=48): checksum=107793
+        TIME: 28.8363 s
+
+Kokkos work (node_rank=49; rank=49): checksum=110036
+        TIME: 29.38 s
+
+Kokkos work (node_rank=50; rank=50): checksum=112278
+        TIME: 30.0844 s
+
+Kokkos work (node_rank=51; rank=51): checksum=114521
+        TIME: 30.5641 s
+
+Kokkos work (node_rank=52; rank=52): checksum=116763
+        TIME: 31.1043 s
+
+Kokkos work (node_rank=53; rank=53): checksum=119006
+        TIME: 31.6937 s
+
+Kokkos work (node_rank=54; rank=54): checksum=121248
+        TIME: 32.4741 s
+
+Kokkos work (node_rank=55; rank=55): checksum=123491
+        TIME: 32.8603 s
+
+Kokkos work (node_rank=56; rank=56): checksum=125733
+        TIME: 33.4113 s
+
+Kokkos work (node_rank=57; rank=57): checksum=127976
+        TIME: 33.9698 s
+
+Kokkos work (node_rank=58; rank=58): checksum=130218
+        TIME: 34.7549 s
+
+Kokkos work (node_rank=59; rank=59): checksum=132461
+        TIME: 35.4382 s
+
+Kokkos work (node_rank=60; rank=60): checksum=134703
+        TIME: 36.0221 s
+
+Kokkos work (node_rank=61; rank=61): checksum=136946
+        TIME: 36.3845 s
+
+Kokkos work (node_rank=62; rank=62): checksum=139188
+        TIME: 37.2124 s
+
+Kokkos work (node_rank=63; rank=63): checksum=141431
+        TIME: 37.6252 s
+
+MPI_TpetraSerial_Kokkos_d__SERIALIZE total wall time: 37.6164 s
