@@ -15,6 +15,193 @@
 #include <iostream>
 #include <fstream>
 
+#include <Amesos.h>
+#include <Amesos_BaseSolver.h>
+
+#include <Epetra_CrsMatrix.h>
+#include <Epetra_LinearProblem.h>
+#include <Epetra_Map.h>
+#include <Epetra_SerialComm.h>
+#include <Epetra_Vector.h>
+
+#include <KokkosLapack_gesv.hpp>
+
+#include <Teuchos_TimeMonitor.hpp>
+
+#include <cmath>
+#include <memory>
+#include <string>
+#include <typeinfo>
+
+
+
+
+
+
+
+
+
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+extern "C" {
+  char* openblas_get_config();
+  int openblas_get_num_threads();
+  void openblas_set_num_threads(int);
+}
+#endif
+
+class ScopedBlasThreads
+{
+ public:
+  explicit ScopedBlasThreads(const int num_threads)
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+    : old_num_threads_(openblas_get_num_threads())
+#endif
+  {
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+    openblas_set_num_threads(num_threads);
+#else
+    (void)num_threads;
+#endif
+  }
+
+  ~ScopedBlasThreads()
+  {
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+    openblas_set_num_threads(old_num_threads_);
+#endif
+  }
+
+  static void set_num_threads(const int num_threads)
+  {
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+    openblas_set_num_threads(num_threads);
+#else
+    (void)num_threads;
+#endif
+  }
+
+  static std::string thread_info()
+  {
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+    return std::to_string(openblas_get_num_threads());
+#else
+    return "OpenBLAS thread control unavailable";
+#endif
+  }
+
+  static void print_info()
+  {
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+    std::cout << "OpenBLAS config: " << openblas_get_config() << "\n";
+    std::cout << "OpenBLAS threads: " << openblas_get_num_threads() << "\n";
+#else
+    std::cout << "OpenBLAS thread control unavailable\n";
+#endif
+  }
+
+ private:
+#ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+  int old_num_threads_;
+#endif
+};
+
+void print_proc_status(const std::string& label, const int world_rank)
+{
+  if (world_rank != 0) return;
+
+  std::ifstream status("/proc/self/status");
+  std::string line;
+
+  std::cout << "-- " << label << " --\n";
+
+  while (std::getline(status, line)) {
+    if (line.rfind("Threads:", 0) == 0 ||
+        line.rfind("Cpus_allowed_list:", 0) == 0 ||
+        line.rfind("voluntary_ctxt_switches:", 0) == 0 ||
+        line.rfind("nonvoluntary_ctxt_switches:", 0) == 0) {
+      std::cout << line << '\n';
+    }
+  }
+
+  std::cout << '\n';
+}
+
+#include <dirent.h>
+#include <sched.h>
+#include <unistd.h>
+
+#include <cerrno>
+#include <cstring>
+#include <vector>
+
+cpu_set_t make_full_node_cpu_set()
+{
+  cpu_set_t mask;
+  CPU_ZERO(&mask);
+
+  const long num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+  for (int cpu = 0; cpu < static_cast<int>(num_cpus); ++cpu) {
+    CPU_SET(cpu, &mask);
+  }
+
+  return mask;
+}
+
+std::vector<pid_t> get_process_thread_ids()
+{
+  std::vector<pid_t> tids;
+
+  DIR* dir = opendir("/proc/self/task");
+  if (dir == nullptr) {
+    return tids;
+  }
+
+  while (dirent* entry = readdir(dir)) {
+    if (entry->d_name[0] == '.') {
+      continue;
+    }
+
+    tids.push_back(static_cast<pid_t>(std::stoi(entry->d_name)));
+  }
+
+  closedir(dir);
+  return tids;
+}
+
+class ScopedAllThreadAffinity
+{
+ public:
+  explicit ScopedAllThreadAffinity(const cpu_set_t& new_mask)
+  {
+    const auto tids = get_process_thread_ids();
+
+    for (const pid_t tid : tids) {
+      cpu_set_t old_mask;
+      CPU_ZERO(&old_mask);
+
+      if (sched_getaffinity(tid, sizeof(cpu_set_t), &old_mask) == 0) {
+        old_masks_.push_back({tid, old_mask});
+      }
+
+      if (sched_setaffinity(tid, sizeof(cpu_set_t), &new_mask) != 0) {
+        std::cerr << "sched_setaffinity failed for tid " << tid
+                  << ": " << std::strerror(errno) << '\n';
+      }
+    }
+  }
+
+  ~ScopedAllThreadAffinity()
+  {
+    for (const auto& [tid, old_mask] : old_masks_) {
+      sched_setaffinity(tid, sizeof(cpu_set_t), &old_mask);
+    }
+  }
+
+ private:
+  std::vector<std::pair<pid_t, cpu_set_t>> old_masks_;
+};
+
+
 int main(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
@@ -35,15 +222,34 @@ int main(int argc, char* argv[])
   Kokkos::ScopeGuard kokkos_guard(argc, argv);
   
   
+  
+  ScopedBlasThreads::set_num_threads(1);
+  if (!world_rank) {
+    std::cout << "-- BLAS thread control information --\n";
+    ScopedBlasThreads::print_info();
+    std::cout << "\n";
+  }
+  
+  
+  
   // Tpetra (with host NO because Tpetra_INST_CUDA=OFF)
   {
     const auto startTime = std::chrono::steady_clock::now();
     
     using LO = int;
     using GO = int;
+    
+    /*
     using map_type = Tpetra::Map<LO, GO>;
     using vec_type = Tpetra::Vector<double, LO, GO>;
-          
+    */
+    using solver_node_type =
+    Tpetra::KokkosCompat::KokkosDeviceWrapperNode<Kokkos::Serial>;
+    using map_type = Tpetra::Map<LO, GO, solver_node_type>;
+    using vec_type = Tpetra::Vector<double, LO, GO, solver_node_type>;
+    
+    
+    
     using node_type = typename vec_type::node_type;
     using device_type = typename vec_type::device_type;
     using execution_space = typename vec_type::execution_space;
@@ -81,22 +287,100 @@ int main(int argc, char* argv[])
     MPI_Barrier(MPI_COMM_WORLD);
   
     if (!world_rank) {
-      std::cout << "Tpetra time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
+      std::cout << "Tpetra section total time:" << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
     }
     
-    MPI_Barrier(MPI_COMM_WORLD);
   }
+  MPI_Barrier(MPI_COMM_WORLD);
   
   
   
   
   
+  if(!world_rank)
+    std::cout<<"\n\n\n\n\n";
   
   
   
-  
-  
-  
+  print_proc_status("before UMFPACK", world_rank);
+  // Amesos / UMFPACK test, with OpenBLAS forced to serial
+{
+  ScopedBlasThreads blas_threads(1);
+
+  const auto startTime = std::chrono::steady_clock::now();
+
+  Epetra_SerialComm serial_comm;
+  const int n = 20000;
+
+  Epetra_Map map(n, 0, serial_comm);
+  Epetra_CrsMatrix A(Copy, map, 3);
+
+  for (int row = 0; row < n; ++row) {
+    int cols[3];
+    double vals[3];
+    int num_entries = 0;
+
+    if (row > 0) {
+      cols[num_entries] = row - 1;
+      vals[num_entries] = -1.0;
+      ++num_entries;
+    }
+
+    cols[num_entries] = row;
+    vals[num_entries] = 2.0;
+    ++num_entries;
+
+    if (row + 1 < n) {
+      cols[num_entries] = row + 1;
+      vals[num_entries] = -1.0;
+      ++num_entries;
+    }
+
+    A.InsertGlobalValues(row, num_entries, vals, cols);
+  }
+
+  A.FillComplete();
+
+  Epetra_Vector x(map);
+  Epetra_Vector b(map);
+
+  x.PutScalar(0.0);
+  b.PutScalar(1.0);
+
+  Epetra_LinearProblem problem(&A, &x, &b);
+
+  Amesos factory;
+  const char* solver_name = "Amesos_Umfpack";
+
+  if (!factory.Query(solver_name)) {
+    if (!world_rank) {
+      std::cout << "UMFPACK test skipped: " << solver_name << " not available\n\n";
+    }
+  } else {
+    std::unique_ptr<Amesos_BaseSolver> solver(factory.Create(solver_name, problem));
+
+    const int symbolic_status = solver->SymbolicFactorization();
+    const int numeric_status = solver->NumericFactorization();
+    const int solve_status = solver->Solve();
+
+    double x_norm = 0.0;
+    x.Norm2(&x_norm);
+
+    if (!world_rank) {
+      std::cout << "-- UMFPACK test --\n";
+      std::cout << "OpenBLAS threads during UMFPACK: " << ScopedBlasThreads::thread_info() << '\n';
+      std::cout << "SymbolicFactorization status: " << symbolic_status << '\n';
+      std::cout << "NumericFactorization status: " << numeric_status << '\n';
+      std::cout << "Solve status: " << solve_status << '\n';
+      std::cout << "x.Norm2() = " << x_norm << '\n';
+      std::cout << "UMFPACK time: "
+                << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count()
+                << " s\n\n";
+    }
+  }
+}
+MPI_Barrier(MPI_COMM_WORLD);
+  print_proc_status("after UMFPACK", world_rank);
   
   
   
@@ -109,10 +393,11 @@ int main(int argc, char* argv[])
   if(!world_rank)
     std::cout<<"\n\n\n\n\n";
   
-  const auto startTime = std::chrono::steady_clock::now();
   
   // Pure Kokkos
   {
+    const auto startTime = std::chrono::steady_clock::now();
+    
     using ExecSpace_DefaultHost_t = Kokkos::DefaultHostExecutionSpace;
     using ExecSpace_Default_t = Kokkos::DefaultExecutionSpace;
     using MemorySpace_Host_t = Kokkos::HostSpace;
@@ -240,18 +525,81 @@ int main(int argc, char* argv[])
           
           
           
+        
+          
+          
+        // KokkosKernels dense LAPACK test, with OpenBLAS temporarily threaded
+        {
+          ScopedBlasThreads blas_threads(64);
+
+          using DenseMatrix_d = ViewMatrix_d;
+          using DenseVector_i = Kokkos::View<int*, Kokkos::LayoutLeft, Device_Default_t>;
+
+          const int dense_n = 2000;
+          const int nrhs = 1;
+
+          DenseMatrix_d A("A_dense", dense_n, dense_n);
+          DenseMatrix_d B("B_dense", dense_n, nrhs);
+          DenseVector_i piv("piv", dense_n);
+
+          Kokkos::parallel_for(
+              "init_dense_system",
+              Kokkos::MDRangePolicy<ExecSpace_Default_t, Kokkos::Rank<2>>({0, 0}, {dense_n, dense_n}),
+              KOKKOS_LAMBDA(const int i, const int j) {
+                if (i == j) {
+                  A(i, j) = 4.0;
+                } else {
+                  A(i, j) = 1.0 / static_cast<double>(dense_n + 1 + Kokkos::abs(i - j));
+                }
+              });
+
+          Kokkos::parallel_for(
+              "init_dense_rhs",
+              Kokkos::RangePolicy<ExecSpace_Default_t>(0, dense_n),
+              KOKKOS_LAMBDA(const int i) {
+                B(i, 0) = 1.0 + 0.001 * static_cast<double>(i % 17);
+              });
+
+          Kokkos::fence();
+
+          const auto startTimeGesv = std::chrono::steady_clock::now();
+
+          KokkosLapack::gesv(A, B, piv);
+
+          Kokkos::fence();
+
+          double solution_norm2 = 0.0;
+          Kokkos::parallel_reduce(
+              "dense_solution_norm",
+              Kokkos::RangePolicy<ExecSpace_Default_t>(0, dense_n),
+              KOKKOS_LAMBDA(const int i, double& local_sum) {
+                local_sum += B(i, 0) * B(i, 0);
+              },
+              solution_norm2);
+
+          std::cout << "KokkosKernels gesv work (node_rank=" << node_rank
+                    << "; world_rank=" << world_rank << "): "
+                    << "BLAS threads=" << ScopedBlasThreads::thread_info()
+                    << ", ||x||=" << std::sqrt(solution_norm2)
+                    << ", time=" << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTimeGesv).count()
+                    << " s\n\n";
+        }
+          
+          
+          
+          
+          
         std::cout << "\tTIME: "<<std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n\n";
       }
       
       MPI_Barrier(comm_node);
     }
+    if (!world_rank) {
+      std::cout << "Kokkos section total time:" << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
+    }
   }
   
   MPI_Barrier(MPI_COMM_WORLD);
-  
-  if (!world_rank) {
-    std::cout << "MPI_TpetraSerial_Kokkos_d__SERIALIZE total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
-  }
 
   return 0;
 }

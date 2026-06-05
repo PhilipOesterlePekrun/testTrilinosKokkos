@@ -12,6 +12,7 @@ module load suite-sparse/5.4.0
 
 export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial_openblasSerial/install
 export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
 
 
 cmake \

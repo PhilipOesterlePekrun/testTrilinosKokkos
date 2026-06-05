@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # A function to set the necessary properties/definitions so a target can be compiled with clangcuda++
 # `compile_mode` can be either CLANGCUDA_MODE_HOST or CLANGCUDA_MODE_DEVICE
 function(configure_clangcuda_target target_name compile_mode)
+if(Kokkos_ENABLE_CUDA)
   set_target_properties("${target_name}" PROPERTIES
     CXX_COMPILER_LAUNCHER ""
     C_COMPILER_LAUNCHER ""
@@ -22,6 +23,7 @@ function(configure_clangcuda_target target_name compile_mode)
   target_compile_definitions("${target_name}" PRIVATE
     ${compile_mode}
   )
+  endif()
 endfunction()
 
 
@@ -33,11 +35,19 @@ message(STATUS "CMAKE_CXX_FLAGS         = ${CMAKE_CXX_FLAGS}")
 
 
 set(CMAKE_PREFIX_PATH ${TRILINOS_PATH} ${CMAKE_PREFIX_PATH})
-find_package(Trilinos REQUIRED COMPONENTS Kokkos Tpetra)
+find_package(Trilinos REQUIRED COMPONENTS
+  Kokkos
+  KokkosKernels
+  Tpetra
+  Epetra
+  Amesos
+)
 
+if(Kokkos_ENABLE_CUDA)
 set(CMAKE_CXX_COMPILER_LAUNCHER "" CACHE STRING "" FORCE)
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "")
+endif()
 
 # DISABLE ALL WARNINGS
 if(MSVC)
@@ -70,7 +80,7 @@ FetchContent_MakeAvailable(rapidyaml)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS OFF CACHE BOOL "" FORCE)
 
 find_package(MPI REQUIRED COMPONENTS CXX)
-find_package(Tpetra REQUIRED)
+#find_package(Tpetra REQUIRED)
 
 add_library(MPI_TpetraSerial_Kokkos_d
   src/MPI_TpetraSerial_Kokkos_d.cpp
@@ -87,7 +97,10 @@ configure_clangcuda_target(exe CLANGCUDA_MODE_HOST)
 add_executable(exe_SERIALIZE
   src/MPI_TpetraSerial_Kokkos_d__SERIALIZE.cpp
   )
-target_link_libraries(exe_SERIALIZE PUBLIC Trilinos::all_selected_libs MPI::MPI_CXX)
+target_link_libraries(exe_SERIALIZE PRIVATE
+  Trilinos::all_selected_libs
+  MPI::MPI_CXX
+)
 configure_clangcuda_target(exe_SERIALIZE CLANGCUDA_MODE_DEVICE)
 
 add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)

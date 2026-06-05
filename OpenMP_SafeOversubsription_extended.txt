@@ -1,0 +1,63 @@
+# This part is the key
+srun \
+  --exclusive \
+  --constraint=h100 \
+  --partition=h100 \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=64 \
+  --cpu-bind=none \
+  --pty bash -l
+
+
+
+
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasThread/install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
+
+
+
+
+export OMP_PROC_BIND=spread # THIS IS IMPORTANT; PERFORMANCE GOES FROM 0.8s TO 3.8s WHEN WE UNSET THIS
+export OMP_NUM_THREADS=64 #32 # USE THIS TO CONTROL NUMBER OF THREADS
+
+export KOKKOS_DISABLE_WARNINGS=1 # THIS IS JUST TO GET RID OF THE ANNOYING STUFF LIKE `Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.`
+
+export OMP_DYNAMIC=false
+export OMP_THREAD_LIMIT=64
+
+export OPENBLAS_NUM_THREADS=1
+
+
+## BUILD
+cmake \
+  -DTRILINOS_PATH=${MY_TRILINOS_INSTALL} \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+../testTrilinosKokkos
+
+
+## RUN
+mpirun \
+  -np 64 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+
+
+
+
+
+
+
+
+mpirun \
+  --oversubscribe \
+  --bind-to core \
+  --map-by core \
+  -np 64 \
+  ./exe_SERIALIZE
