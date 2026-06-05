@@ -38,7 +38,7 @@
 
 
 
-
+#define TEST_HAVE_OPENBLAS_THREAD_CONTROL 1
 
 
 #ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
@@ -168,6 +168,43 @@ std::vector<pid_t> get_process_thread_ids()
   return tids;
 }
 
+
+
+#include <cstdlib>
+#include <string>
+
+#include <cstdlib>
+#include <string>
+#include <unistd.h>
+
+void set_all_thread_affinity(const std::string& cpu_list)
+{
+  const std::string pid = std::to_string(getpid());
+
+  const std::string cmd =
+      "for t in /proc/" + pid + "/task/*; do "
+      "taskset -pc " + cpu_list + " ${t##*/} >/dev/null; "
+      "done";
+
+  std::system(cmd.c_str());
+}
+
+#include <thread>
+void sleepy_barrier(MPI_Comm comm)
+{
+  MPI_Request request;
+  MPI_Ibarrier(comm, &request);
+
+  int done = 0;
+  while (!done) {
+    MPI_Test(&request, &done, MPI_STATUS_IGNORE);
+
+    if (!done) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+  }
+}
+
 class ScopedAllThreadAffinity
 {
  public:
@@ -214,6 +251,26 @@ int main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
   
+  MPI_Comm comm_node = MPI_COMM_NULL;
+    MPI_Comm_split_type(
+        MPI_COMM_WORLD,
+        MPI_COMM_TYPE_SHARED,
+        0,
+        MPI_INFO_NULL,
+        &comm_node);
+
+    int node_rank, node_size;
+    MPI_Comm_rank(comm_node, &node_rank);
+    MPI_Comm_size(comm_node, &node_size);
+    
+    char proc_name[MPI_MAX_PROCESSOR_NAME];
+    int proc_name_len = 0;
+    MPI_Get_processor_name(proc_name, &proc_name_len);
+  
+  
+  
+  
+  
   if(!world_rank) {
     std::cout << "-- MPI information --\n";
     std::cout << "world_size: " << world_size << "\n\n";
@@ -230,10 +287,12 @@ int main(int argc, char* argv[])
     std::cout << "\n";
   }
   
+    set_all_thread_affinity(std::to_string(node_rank));
   
   
   // Tpetra (with host NO because Tpetra_INST_CUDA=OFF)
   {
+    set_all_thread_affinity(std::to_string(node_rank));
     const auto startTime = std::chrono::steady_clock::now();
     
     using LO = int;
@@ -306,6 +365,7 @@ int main(int argc, char* argv[])
   // Amesos / UMFPACK test, with OpenBLAS forced to serial
 {
   ScopedBlasThreads blas_threads(1);
+  set_all_thread_affinity(std::to_string(node_rank));
 
   const auto startTime = std::chrono::steady_clock::now();
 
@@ -394,6 +454,9 @@ MPI_Barrier(MPI_COMM_WORLD);
     std::cout<<"\n\n\n\n\n";
   
   
+    Kokkos::fence();
+set_all_thread_affinity("0-63");
+Kokkos::fence();
   // Pure Kokkos
   {
     const auto startTime = std::chrono::steady_clock::now();
@@ -420,21 +483,7 @@ MPI_Barrier(MPI_COMM_WORLD);
     }
     
     
-    MPI_Comm comm_node = MPI_COMM_NULL;
-    MPI_Comm_split_type(
-        MPI_COMM_WORLD,
-        MPI_COMM_TYPE_SHARED,
-        0,
-        MPI_INFO_NULL,
-        &comm_node);
-
-    int node_rank, node_size;
-    MPI_Comm_rank(comm_node, &node_rank);
-    MPI_Comm_size(comm_node, &node_size);
     
-    char proc_name[MPI_MAX_PROCESSOR_NAME];
-    int proc_name_len = 0;
-    MPI_Get_processor_name(proc_name, &proc_name_len);
     
     
     for (int owner = 0; owner < node_size; ++owner) {
@@ -452,6 +501,11 @@ MPI_Barrier(MPI_COMM_WORLD);
         
         std::cout << "Kokkos work (node_rank="<<node_rank<<"; world_rank="<<world_rank<<"): "
           << "X_h(n/2)="<<X_h(n/2)<<"\n";*/
+          
+        Kokkos::fence();
+
+const cpu_set_t full_node_mask = make_full_node_cpu_set();
+ScopedAllThreadAffinity full_node_affinity(full_node_mask);
           
         
         const int n = 8000000;
@@ -592,8 +646,11 @@ MPI_Barrier(MPI_COMM_WORLD);
         std::cout << "\tTIME: "<<std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n\n";
       }
       
-      MPI_Barrier(comm_node);
+      sleepy_barrier(comm_node);//MPI_Barrier(comm_node);
     }
+    Kokkos::fence();
+set_all_thread_affinity(std::to_string(node_rank));
+Kokkos::fence();
     if (!world_rank) {
       std::cout << "Kokkos section total time:" << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
     }

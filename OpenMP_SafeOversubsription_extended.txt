@@ -16,7 +16,7 @@ module load cmake
 module load openmpi/4.1.8
 module load suite-sparse/5.4.0
 
-export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasThread/install
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasThread_h100/install
 export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
 
@@ -61,3 +61,205 @@ mpirun \
   --map-by core \
   -np 64 \
   ./exe_SERIALIZE
+  
+  
+  
+  
+  
+###### WHAT THE HELL IT IS WORKING //###########
+  
+  oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp_openblasThread$ mpirun   --oversubscribe   --bind-to core   --map-by core   --mca mpi_yield_when_idle 1   -np 64   ./exe_SERIALIZE [A
+-- MPI information --
+world_size: 64
+
+-- BLAS thread control information --
+OpenBLAS config: OpenBLAS 0.3.26 NO_AFFINITY SAPPHIRERAPIDS MAX_THREADS=64
+OpenBLAS threads: 1
+
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6SerialE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Tpetra work: x.norm2() = 71554.2
+
+Tpetra section total time:0.271052 s
+
+
+
+
+
+-- before UMFPACK --
+Threads:        67
+Cpus_allowed_list:      0
+voluntary_ctxt_switches:        1213
+nonvoluntary_ctxt_switches:     125
+
+-- UMFPACK test --
+OpenBLAS threads during UMFPACK: 1
+SymbolicFactorization status: 0
+NumericFactorization status: 0
+Solve status: 0
+x.Norm2() = 5.16462e+09
+UMFPACK time: 0.0314146 s
+
+-- after UMFPACK --
+Threads:        67
+Cpus_allowed_list:      0
+voluntary_ctxt_switches:        1218
+nonvoluntary_ctxt_switches:     168
+
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 64
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (node_rank=0; world_rank=0): checksum=171.502
+KokkosKernels gesv work (node_rank=0; world_rank=0): BLAS threads=64, ||x||=9.44796, time=0.135425 s
+
+        TIME: 1.17668 s
+
+Kokkos work (node_rank=1; world_rank=1): checksum=2395.99
+KokkosKernels gesv work (node_rank=1; world_rank=1): BLAS threads=64, ||x||=9.44796, time=0.135464 s
+
+        TIME: 2.36334 s
+
+Kokkos work (node_rank=2; world_rank=2): checksum=4637.87
+KokkosKernels gesv work (node_rank=2; world_rank=2): BLAS threads=64, ||x||=9.44796, time=0.135068 s
+
+        TIME: 3.53668 s
+
+Kokkos work (node_rank=3; world_rank=3): checksum=6880.17
+KokkosKernels gesv work (node_rank=3; world_rank=3): BLAS threads=64, ||x||=9.44796, time=0.112804 s
+
+        TIME: 4.61908 s
+
+Kokkos work (node_rank=4; world_rank=4): checksum=9122.58
+KokkosKernels gesv work (node_rank=4; world_rank=4): BLAS threads=64, ||x||=9.44796, time=0.135252 s
+
+        TIME: 5.76996 s
+
+Kokkos work (node_rank=5; world_rank=5): checksum=11365
+KokkosKernels gesv work (node_rank=5; world_rank=5): BLAS threads=64, ||x||=9.44796, time=0.135352 s
+
+        TIME: 6.91409 s
+
+Kokkos work (node_rank=6; world_rank=6): checksum=13607.5
+KokkosKernels gesv work (node_rank=6; world_rank=6): BLAS threads=64, ||x||=9.44796, time=0.13544 s
+
+        TIME: 8.11006 s
+
+Kokkos work (node_rank=7; world_rank=7): checksum=15850
+oesterle@node38:~/rd/testTrilinosKokkos_Base/build_openmp_openblasThread$ mpirun   -np 64   --bind-to none   --map-by slot:OVERSUBSCRIBE   ./exe_SERIALIZE
+-- MPI information --
+world_size: 64
+
+-- BLAS thread control information --
+OpenBLAS config: OpenBLAS 0.3.26 NO_AFFINITY SAPPHIRERAPIDS MAX_THREADS=64
+OpenBLAS threads: 1
+
+-- Tpetra type information --
+vec_type::node_type        = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type      = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space  = N6Kokkos6SerialE
+vec_type::memory_space     = N6Kokkos9HostSpaceE
+
+Tpetra work: x.norm2() = 71554.2
+
+Tpetra section total time:0.307781 s
+
+
+
+
+
+-- before UMFPACK --
+Threads:        67
+Cpus_allowed_list:      0
+voluntary_ctxt_switches:        2731
+nonvoluntary_ctxt_switches:     432
+
+-- UMFPACK test --
+OpenBLAS threads during UMFPACK: 1
+SymbolicFactorization status: 0
+NumericFactorization status: 0
+Solve status: 0
+x.Norm2() = 5.16462e+09
+UMFPACK time: 0.0237363 s
+
+-- after UMFPACK --
+Threads:        67
+Cpus_allowed_list:      0
+voluntary_ctxt_switches:        2734
+nonvoluntary_ctxt_switches:     466
+
+
+
+
+
+
+-- Kokkos information --
+Threads in use: 64
+Default execution space: N6Kokkos6OpenMPE
+Default host execution space: N6Kokkos6OpenMPE
+Default memory space: N6Kokkos9HostSpaceE
+Default host memory space: N6Kokkos9HostSpaceE
+Num devices = -1
+
+Kokkos work (node_rank=0; world_rank=0): checksum=171.502
+KokkosKernels gesv work (node_rank=0; world_rank=0): BLAS threads=64, ||x||=9.44796, time=0.112927 s
+
+        TIME: 0.977335 s
+
+Kokkos work (node_rank=1; world_rank=1): checksum=2395.99
+KokkosKernels gesv work (node_rank=1; world_rank=1): BLAS threads=64, ||x||=9.44796, time=0.112526 s
+
+        TIME: 1.92856 s
+
+Kokkos work (node_rank=2; world_rank=2): checksum=4637.87
+KokkosKernels gesv work (node_rank=2; world_rank=2): BLAS threads=64, ||x||=9.44796, time=0.112847 s
+
+        TIME: 2.85605 s
+
+Kokkos work (node_rank=3; world_rank=3): checksum=6880.17
+KokkosKernels gesv work (node_rank=3; world_rank=3): BLAS threads=64, ||x||=9.44796, time=0.112881 s
+
+        TIME: 3.66692 s
+
+Kokkos work (node_rank=4; world_rank=4): checksum=9122.58
+KokkosKernels gesv work (node_rank=4; world_rank=4): BLAS threads=64, ||x||=9.44796, time=0.11275 s
+
+        TIME: 4.52218 s
+
+Kokkos work (node_rank=5; world_rank=5): checksum=11365
+KokkosKernels gesv work (node_rank=5; world_rank=5): BLAS threads=64, ||x||=9.44796, time=0.113062 s
+
+        TIME: 5.34714 s
+
+Kokkos work (node_rank=6; world_rank=6): checksum=13607.5
+KokkosKernels gesv work (node_rank=6; world_rank=6): BLAS threads=64, ||x||=9.44796, time=0.112917 s
+
+        TIME: 6.17699 s
+
+Kokkos work (node_rank=7; world_rank=7): checksum=15850
+KokkosKernels gesv work (node_rank=7; world_rank=7): BLAS threads=64, ||x||=9.44796, time=0.112322 s
+
+        TIME: 6.99474 s
+
+Kokkos work (node_rank=8; world_rank=8): checksum=18092.5
+KokkosKernels gesv work (node_rank=8; world_rank=8): BLAS threads=64, ||x||=9.44796, time=0.112439 s
+
+        TIME: 7.81573 s
+
+Kokkos work (node_rank=9; world_rank=9): checksum=20335
+KokkosKernels gesv work (node_rank=9; world_rank=9): BLAS threads=64, ||x||=9.44796, time=0.113193 s
+
+        TIME: 8.64665 s
