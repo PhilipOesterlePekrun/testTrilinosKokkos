@@ -22,13 +22,14 @@ int main(int argc, char* argv[])
   {
     ~CleanUpMPI() { MPI_Finalize(); }
   } cleanup_mpi;
-  int rank = 0, size = 1;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
   
-  if(!rank) {
+  int world_rank, world_size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+  
+  if(!world_rank) {
     std::cout << "-- MPI information --\n";
-    std::cout << "size: " << size << "\n\n";
+    std::cout << "world_size: " << world_size << "\n\n";
   }
 
   Kokkos::ScopeGuard kokkos_guard(argc, argv);
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
     using execution_space = typename vec_type::execution_space;
     using memory_space = typename device_type::memory_space;
 
-    if (!rank) {
+    if (!world_rank) {
       std::cout << "-- Tpetra type information --\n";
       std::cout << "vec_type::node_type        = " << typeid(node_type).name() << '\n';
       std::cout << "vec_type::device_type      = " << typeid(device_type).name() << '\n';
@@ -70,7 +71,7 @@ int main(int argc, char* argv[])
     x.putScalar(1.0);
     x.scale(2.0);
     auto xNorm = x.norm2();
-    if (!rank) {
+    if (!world_rank) {
       std::cout << "Tpetra work: ";
       std::cout << "x.norm2() = " << xNorm << "\n\n";
     }
@@ -79,7 +80,7 @@ int main(int argc, char* argv[])
     
     MPI_Barrier(MPI_COMM_WORLD);
   
-    if (!rank) {
+    if (!world_rank) {
       std::cout << "Tpetra time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
     }
     
@@ -105,7 +106,7 @@ int main(int argc, char* argv[])
   
   
   
-  if(!rank)
+  if(!world_rank)
     std::cout<<"\n\n\n\n\n";
   
   const auto startTime = std::chrono::steady_clock::now();
@@ -122,7 +123,7 @@ int main(int argc, char* argv[])
     using ViewVector_d = Kokkos::View<double*, Kokkos::LayoutLeft, Device_Default_t>;
     using ViewMatrix_d = Kokkos::View<double**, Kokkos::LayoutLeft, Device_Default_t>;
     
-    if(!rank) {
+    if(!world_rank) {
       std::cout << "-- Kokkos information --\n";
       std::cout << "Threads in use: " << ExecSpace_Default_t().concurrency() << "\n";
       std::cout << "Default execution space: " << typeid(ExecSpace_Default_t).name() << "\n";
@@ -141,10 +142,6 @@ int main(int argc, char* argv[])
         0,
         MPI_INFO_NULL,
         &comm_node);
-        
-    int world_rank, world_size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
     int node_rank, node_size;
     MPI_Comm_rank(comm_node, &node_rank);
@@ -163,12 +160,12 @@ int main(int argc, char* argv[])
         Kokkos::deep_copy(X_d, 0);
         Kokkos::parallel_for(
           n, KOKKOS_LAMBDA(const int i) {
-            X_d(i) = 10*rank;
+            X_d(i) = 10*world_rank;
           });
         
         auto X_h = Kokkos::create_mirror_view_and_copy(ExecSpace_DefaultHost_t(), X_d);
         
-        std::cout << "Kokkos work (node_rank="<<node_rank<<"; rank="<<rank<<"): "
+        std::cout << "Kokkos work (node_rank="<<node_rank<<"; world_rank="<<world_rank<<"): "
           << "X_h(n/2)="<<X_h(n/2)<<"\n";*/
           
         
@@ -183,7 +180,7 @@ int main(int argc, char* argv[])
           "init",
           n, KOKKOS_LAMBDA(const int i) {
             const double a = static_cast<double>((i % 97) + 1);
-            X_d(i) = static_cast<double>(rank) + 0.001 * a;
+            X_d(i) = static_cast<double>(node_rank) + 0.001 * a;
             Y_d(i) = 0.002 * a;
             Z_d(i) = 0.0;
           });
@@ -238,7 +235,7 @@ int main(int argc, char* argv[])
           },
           checksum);
 
-        std::cout << "Kokkos work (node_rank="<<node_rank<<"; rank="<<rank<<"): "
+        std::cout << "Kokkos work (node_rank="<<node_rank<<"; world_rank="<<world_rank<<"): "
           << "checksum="<<std::sqrt(checksum)<<"\n";
           
           
@@ -252,7 +249,7 @@ int main(int argc, char* argv[])
   
   MPI_Barrier(MPI_COMM_WORLD);
   
-  if (!rank) {
+  if (!world_rank) {
     std::cout << "MPI_TpetraSerial_Kokkos_d__SERIALIZE total wall time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";
   }
 

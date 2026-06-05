@@ -1,0 +1,73 @@
+# WORKS OPENMP OVERSUBSCRIBE
+
+# This part is the key
+srun \
+  --exclusive \
+  --constraint=h100 \
+  --partition=h100 \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=64 \
+  --cpu-bind=none \
+  --pty bash -l
+  
+  
+  
+  
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasOpenMP/install
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+
+
+
+
+export OMP_PROC_BIND=spread # THIS IS IMPORTANT; PERFORMANCE GOES FROM 0.8s TO 3.8s WHEN WE UNSET THIS
+export OMP_NUM_THREADS=64 #32 # USE THIS TO CONTROL NUMBER OF THREADS
+
+export KOKKOS_DISABLE_WARNINGS=1 # THIS IS JUST TO GET RID OF THE ANNOYING STUFF LIKE `Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.`
+
+
+
+
+mpirun \
+  -np 64 \
+  --bind-to none \
+  --map-by slot:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+
+
+
+
+
+
+
+
+
+# TWO (MULTIPLE) NODES:
+
+srun --exclusive \
+  --constraint=h100 \
+  --partition=h100 \
+  --nodes=2-2 \
+  --ntasks=2 \
+  --ntasks-per-node=1 \
+  --gpus-per-node=1 \
+  --cpus-per-task=64 \
+  --cpu-bind=none \
+  --pty bash -l
+  
+export OMPI_MCA_mpi_yield_when_idle=1 # THIS IS THE CRITICAL THING TO MAKE IT WORK ON MULTIPLE NODES. IT WORKS PERFECTLY i.e. THERE IS NO CONFLICT AND NO OVERHEAD OR ANYTHING LIKE THAT COMPARED TO RUNNING ON ONE NODE
+
+mpirun \
+  -np 128 \
+  --bind-to none \
+  --map-by ppr:64:node:OVERSUBSCRIBE \
+  ./exe_SERIALIZE
+  
+  
+  
+
+
