@@ -1,3 +1,5 @@
+# Main chat: https://chatgpt.com/c/6a1ffa15-9780-83eb-8eb4-3f28cae86569
+
 # This part is the key
 srun \
   --exclusive \
@@ -8,6 +10,18 @@ srun \
   --cpus-per-task=64 \
   --cpu-bind=none \
   --pty bash -l
+  
+(
+srun \
+  --exclusive \
+  --constraint=cascadelake \
+  --partition=cascadelake \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=52 \
+  --cpu-bind=none \
+  --pty bash -l
+)
 
 
 
@@ -25,11 +39,13 @@ export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRA
 
 export OMP_PROC_BIND=spread # THIS IS IMPORTANT; PERFORMANCE GOES FROM 0.8s TO 3.8s WHEN WE UNSET THIS
 export OMP_NUM_THREADS=64 #32 # USE THIS TO CONTROL NUMBER OF THREADS
+export OMP_NUM_THREADS=52
 
 export KOKKOS_DISABLE_WARNINGS=1 # THIS IS JUST TO GET RID OF THE ANNOYING STUFF LIKE `Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.`
 
 export OMP_DYNAMIC=false
 export OMP_THREAD_LIMIT=64
+export OMP_THREAD_LIMIT=52
 
 export OPENBLAS_NUM_THREADS=1
 
@@ -54,12 +70,19 @@ mpirun \
 
 
 
-
+## USE THIS FINAL //#####
 mpirun \
   --oversubscribe \
   --bind-to core \
   --map-by core \
   -np 64 \
+  ./exe_SERIALIZE
+  
+mpirun \
+  --oversubscribe \
+  --bind-to core \
+  --map-by core \
+  -np 52 \
   ./exe_SERIALIZE
   
   

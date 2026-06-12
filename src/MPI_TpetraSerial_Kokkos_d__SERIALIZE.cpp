@@ -575,7 +575,9 @@ ScopedAllThreadAffinity full_node_affinity(full_node_mask);
           checksum);
 
         std::cout << "Kokkos work (node_rank="<<node_rank<<"; world_rank="<<world_rank<<"): "
-          << "checksum="<<std::sqrt(checksum)<<"\n";
+          << "checksum="<<std::sqrt(checksum)
+          << ", time=" << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count()
+                    << " s\n";
           
           
           
@@ -584,12 +586,14 @@ ScopedAllThreadAffinity full_node_affinity(full_node_mask);
           
         // KokkosKernels dense LAPACK test, with OpenBLAS temporarily threaded
         {
-          ScopedBlasThreads blas_threads(64);
+          ScopedBlasThreads blas_threads(omp_get_max_threads());
+          
+          std::cout<<"(omp_get_max_threads() = "<<omp_get_max_threads()<<" = blas_threads)\n\n";
 
           using DenseMatrix_d = ViewMatrix_d;
           using DenseVector_i = Kokkos::View<int*, Kokkos::LayoutLeft, Device_Default_t>;
 
-          const int dense_n = 2000;
+          const int dense_n = 20000;
           const int nrhs = 1;
 
           DenseMatrix_d A("A_dense", dense_n, dense_n);
@@ -643,7 +647,7 @@ ScopedAllThreadAffinity full_node_affinity(full_node_mask);
           
           
           
-        std::cout << "\tTIME: "<<std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n\n";
+        std::cout << "\tTOTAL KOKKOS TIME: "<<std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n\n";
       }
       
       sleepy_barrier(comm_node);//MPI_Barrier(comm_node);
