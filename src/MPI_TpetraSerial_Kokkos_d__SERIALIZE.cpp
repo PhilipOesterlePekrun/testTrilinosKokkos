@@ -326,7 +326,7 @@ int main(int argc, char* argv[])
     auto comm = Teuchos::rcp(
     new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
 
-    const LO local_num_rows = 20000000;
+    const LO local_num_rows = 200000000;
     auto map = Teuchos::rcp(
       new map_type(Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid(),
         local_num_rows, 0, comm));
@@ -359,6 +359,105 @@ int main(int argc, char* argv[])
   if(!world_rank)
     std::cout<<"\n\n\n\n\n";
   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // Tpetra with fixed global vector size independent of MPI rank count
+{
+  set_all_thread_affinity(std::to_string(node_rank));
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  const auto startTime = std::chrono::steady_clock::now();
+
+  using LO = int;
+  using GO = int;
+
+  using solver_node_type =
+      Tpetra::KokkosCompat::KokkosDeviceWrapperNode<Kokkos::Serial>;
+
+  using map_type = Tpetra::Map<LO, GO, solver_node_type>;
+  using vec_type = Tpetra::Vector<double, LO, GO, solver_node_type>;
+
+  using node_type = typename vec_type::node_type;
+  using device_type = typename vec_type::device_type;
+  using execution_space = typename vec_type::execution_space;
+  using memory_space = typename device_type::memory_space;
+
+  if (!world_rank) {
+    std::cout << "-- Tpetra type information --\n";
+    std::cout << "vec_type::node_type        = " << typeid(node_type).name() << '\n';
+    std::cout << "vec_type::device_type      = " << typeid(device_type).name() << '\n';
+    std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
+    std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
+    std::cout << '\n';
+  }
+
+  auto comm = Teuchos::rcp(
+      new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
+
+  const Tpetra::global_size_t global_num_rows = 200000000;
+
+  auto map = Teuchos::rcp(
+      new map_type(global_num_rows, 0, comm));
+
+  const auto local_num_rows = map->getLocalNumElements();
+
+  if (!world_rank) {
+    std::cout << "-- Tpetra fixed-global-size test --\n";
+    std::cout << "global_num_rows = " << global_num_rows << '\n';
+    std::cout << "world_size      = " << world_size << '\n';
+  }
+
+  std::cout << "rank " << world_rank
+            << " local_num_rows = " << local_num_rows << '\n';
+
+  vec_type x(map);
+
+  x.putScalar(1.0);
+  x.scale(2.0);
+
+  auto xNorm = x.norm2();
+
+  const double local_time =
+      std::chrono::duration<double>(
+          std::chrono::steady_clock::now() - startTime).count();
+
+  double max_time = 0.0;
+  MPI_Reduce(
+      &local_time,
+      &max_time,
+      1,
+      MPI_DOUBLE,
+      MPI_MAX,
+      0,
+      MPI_COMM_WORLD);
+
+  if (!world_rank) {
+    std::cout << "Tpetra work: x.norm2() = " << xNorm << "\n";
+    std::cout << "Expected norm         = " << 2.0 * std::sqrt(static_cast<double>(global_num_rows)) << "\n";
+    std::cout << "Tpetra section max time: " << max_time << " s\n";
+  }
+}
+MPI_Barrier(MPI_COMM_WORLD);
+
+if (!world_rank) {
+  std::cout << "\n\n\n\n\n";
+}
+    
+    
+    
+    
+    
+    
+    
+    
+  
   
   
   print_proc_status("before UMFPACK", world_rank);
@@ -370,7 +469,7 @@ int main(int argc, char* argv[])
   const auto startTime = std::chrono::steady_clock::now();
 
   Epetra_SerialComm serial_comm;
-  const int n = 20000;
+  const int n = 2000000;
 
   Epetra_Map map(n, 0, serial_comm);
   Epetra_CrsMatrix A(Copy, map, 3);
@@ -455,7 +554,8 @@ MPI_Barrier(MPI_COMM_WORLD);
   
   
     Kokkos::fence();
-set_all_thread_affinity("0-63");
+const int num_threads = omp_get_max_threads();
+set_all_thread_affinity("0-" + std::to_string(num_threads - 1)); //64
 Kokkos::fence();
   // Pure Kokkos
   {
@@ -586,7 +686,7 @@ ScopedAllThreadAffinity full_node_affinity(full_node_mask);
           
         // KokkosKernels dense LAPACK test, with OpenBLAS temporarily threaded
         {
-          ScopedBlasThreads blas_threads(omp_get_max_threads());
+          ScopedBlasThreads blas_threads(omp_get_max_threads()); //64
           
           std::cout<<"(omp_get_max_threads() = "<<omp_get_max_threads()<<" = blas_threads)\n\n";
 

@@ -39,13 +39,17 @@ export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRA
 
 export OMP_PROC_BIND=spread # THIS IS IMPORTANT; PERFORMANCE GOES FROM 0.8s TO 3.8s WHEN WE UNSET THIS
 export OMP_NUM_THREADS=64 #32 # USE THIS TO CONTROL NUMBER OF THREADS
+(
 export OMP_NUM_THREADS=52
+)
 
 export KOKKOS_DISABLE_WARNINGS=1 # THIS IS JUST TO GET RID OF THE ANNOYING STUFF LIKE `Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.`
 
 export OMP_DYNAMIC=false
 export OMP_THREAD_LIMIT=64
+(
 export OMP_THREAD_LIMIT=52
+)
 
 export OPENBLAS_NUM_THREADS=1
 
@@ -57,7 +61,7 @@ cmake \
 ../testTrilinosKokkos
 
 
-## RUN
+## RUN (OLD)
 mpirun \
   -np 64 \
   --bind-to none \
