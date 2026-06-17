@@ -95,7 +95,7 @@ configure_clangcuda_target(exe CLANGCUDA_MODE_HOST)
 
 
 add_executable(exe_SERIALIZE
-  src/MPI_TpetraSerial_Kokkos_d__SERIALIZE.cpp
+  src/MPI_TpetraSerial_Kokkos_d__SERIALIZE.cpp src/SERIALIZE_fixTpetraHashSymbols.cpp
   )
 target_link_libraries(exe_SERIALIZE PRIVATE
   Trilinos::all_selected_libs
@@ -107,3 +107,47 @@ add_executable(exe_nvcc_fails src/nvcc_fails_to_compile.cpp)
 
 target_link_libraries(exe_nvcc_fails PRIVATE Trilinos::all_selected_libs MPI::MPI_CXX) # OR Trilinos::all_selected_libs, really does not matter
 configure_clangcuda_target(exe_nvcc_fails CLANGCUDA_MODE_HOST)
+
+set(LIBQUO_ROOT "" CACHE PATH "Path to libquo installation prefix")
+
+if(NOT LIBQUO_ROOT)
+  message(FATAL_ERROR "Set LIBQUO_ROOT to your libquo install prefix, e.g. -DLIBQUO_ROOT=$ENV{HOME}/rd/tpl/libquo_install")
+endif()
+
+find_path(LIBQUO_INCLUDE_DIR
+  NAMES quo.h
+  PATHS "${LIBQUO_ROOT}/include"
+  NO_DEFAULT_PATH
+  REQUIRED
+)
+
+find_library(LIBQUO_LIBRARY
+  NAMES quo
+  PATHS "${LIBQUO_ROOT}/lib"
+  NO_DEFAULT_PATH
+  REQUIRED
+)
+
+add_library(LIBQUO::quo UNKNOWN IMPORTED)
+
+set_target_properties(LIBQUO::quo PROPERTIES
+  IMPORTED_LOCATION "${LIBQUO_LIBRARY}"
+  INTERFACE_INCLUDE_DIRECTORIES "${LIBQUO_INCLUDE_DIR}"
+)
+
+add_executable(exe_Quo
+  src/MPI_Tpetra_Kokkos_Quo.cpp
+  src/SERIALIZE_fixTpetraHashSymbols.cpp
+)
+
+target_link_libraries(exe_Quo PRIVATE
+  Trilinos::all_selected_libs
+  MPI::MPI_CXX
+  LIBQUO::quo
+)
+
+target_link_options(exe_Quo PRIVATE
+  "-Wl,-rpath,${LIBQUO_ROOT}/lib"
+)
+
+#configure_clangcuda_target(exe_Quo CLANGCUDA_MODE_DEVICE)

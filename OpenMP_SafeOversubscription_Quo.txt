@@ -1,0 +1,521 @@
+
+#(
+srun \
+  --exclusive \
+  --constraint=cascadelake \
+  --partition=cascadelake \
+  --nodes=1 \
+  --ntasks=1 \
+  --cpus-per-task=52 \
+  --cpu-bind=none \
+  --pty bash -l
+#)
+
+
+
+
+module load cmake
+module load openmpi/4.1.8
+module load suite-sparse/5.4.0
+
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasThread_cascadelake_clean_2/install
+
+export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
+
+export OPENBLAS_ROOT=/home/oesterle/rd/tpl/OpenBLAS_base/install_thread_cascadelake/
+export LD_LIBRARY_PATH=${OPENBLAS_ROOT}/lib:$LD_LIBRARY_PATH
+
+
+
+
+export OMP_PROC_BIND=spread # THIS IS IMPORTANT; PERFORMANCE GOES FROM 0.8s TO 3.8s WHEN WE UNSET THIS
+export OMP_NUM_THREADS=52 #32 # USE THIS TO CONTROL NUMBER OF THREADS
+
+
+export KOKKOS_DISABLE_WARNINGS=1 # THIS IS JUST TO GET RID OF THE ANNOYING STUFF LIKE `Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.`
+
+export OMP_DYNAMIC=false
+export OMP_THREAD_LIMIT=52 # POSSIBLY OPTIONAL, BUT IT SEEMS TO CONSISTENTLY MAKE A VERY TINY POSITIVE PERFORMANCE DIFFERENCE IDK?
+
+
+export OPENBLAS_NUM_THREADS=52
+
+
+
+
+
+
+cmake \
+  -DTRILINOS_PATH=${MY_TRILINOS_INSTALL} \
+  -DLIBQUO_ROOT=/home/oesterle/rd/tpl/libquo_base/install \
+  -DCMAKE_CXX_COMPILER=/opt/openmpi/4.1.8/gcc/bin/mpicxx \
+../testTrilinosKokkos
+
+make -j exe_Quo
+
+mpirun \
+  --oversubscribe \
+  --bind-to core \
+  --map-by core \
+  -np 52 \
+  ./exe_Quo
+  
+  
+  
+  
+  
+# Build with #define USE_QUO 1
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=false
+unset OMP_PLACES
+unset KOKKOS_NUM_THREADS
+
+mpirun --oversubscribe --map-by core --bind-to core -np 52 ./exe_Quo
+
+
+
+
+
+
+
+
+
+# USE_QUO 0 in code
+
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=false
+unset OMP_PLACES
+unset KOKKOS_NUM_THREADS
+
+mpirun --bind-to none -np 1 ./exe_Quo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+RESULTS:{
+  oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+# Build with #define USE_QUO 1
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=false
+unset OMP_PLACES
+unset KOKKOS_NUM_THREADS
+
+mpirun --oversubscribe --map-by core --bind-to core -np 52 ./exe_Quo
+
+USE_QUO = 1
+world_size = 52
+node_size = 52
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 8944.27
+Tpetra max time = 0.0073595 s
+
+-- serialized Kokkos region --
+
+world_rank=0 node_rank=0 time=1.02174 checksum=4472.35
+  before: 0
+  pushed: 0-51
+  after:  0
+
+world_rank=1 node_rank=1 time=1.07474 checksum=4472.35
+  before: 1
+  pushed: 0-51
+  after:  1
+
+world_rank=2 node_rank=2 time=1.13926 checksum=4472.35
+  before: 2
+  pushed: 0-51
+  after:  2
+
+world_rank=3 node_rank=3 time=1.03046 checksum=4472.35
+  before: 3
+  pushed: 0-51
+  after:  3
+
+world_rank=4 node_rank=4 time=1.07165 checksum=4472.35
+  before: 4
+  pushed: 0-51
+  after:  4
+
+world_rank=5 node_rank=5 time=0.97455 checksum=4472.35
+  before: 5
+  pushed: 0-51
+  after:  5
+
+world_rank=6 node_rank=6 time=0.952516 checksum=4472.35
+  before: 6
+  pushed: 0-51
+  after:  6
+
+world_rank=7 node_rank=7 time=1.04943 checksum=4472.35
+  before: 7
+  pushed: 0-51
+  after:  7
+
+world_rank=8 node_rank=8 time=1.00592 checksum=4472.35
+  before: 8
+  pushed: 0-51
+  after:  8
+
+world_rank=9 node_rank=9 time=1.01477 checksum=4472.35
+  before: 9
+  pushed: 0-51
+  after:  9
+
+world_rank=10 node_rank=10 time=0.848098 checksum=4472.35
+  before: 10
+  pushed: 0-51
+  after:  10
+
+world_rank=11 node_rank=11 time=0.85206 checksum=4472.35
+  before: 11
+  pushed: 0-51
+  after:  11
+
+world_rank=12 node_rank=12 time=0.998134 checksum=4472.35
+  before: 12
+  pushed: 0-51
+  after:  12
+
+world_rank=13 node_rank=13 time=1.06943 checksum=4472.35
+  before: 13
+  pushed: 0-51
+  after:  13
+
+world_rank=14 node_rank=14 time=0.982882 checksum=4472.35
+  before: 14
+  pushed: 0-51
+  after:  14
+
+world_rank=15 node_rank=15 time=0.991775 checksum=4472.35
+  before: 15
+  pushed: 0-51
+  after:  15
+
+world_rank=16 node_rank=16 time=0.961988 checksum=4472.35
+  before: 16
+  pushed: 0-51
+  after:  16
+
+world_rank=17 node_rank=17 time=1.04126 checksum=4472.35
+  before: 17
+  pushed: 0-51
+  after:  17
+
+world_rank=18 node_rank=18 time=0.980374 checksum=4472.35
+  before: 18
+  pushed: 0-51
+  after:  18
+
+world_rank=19 node_rank=19 time=0.971288 checksum=4472.35
+  before: 19
+  pushed: 0-51
+  after:  19
+
+world_rank=20 node_rank=20 time=1.0528 checksum=4472.35
+  before: 20
+  pushed: 0-51
+  after:  20
+
+world_rank=21 node_rank=21 time=1.03044 checksum=4472.35
+  before: 21
+  pushed: 0-51
+  after:  21
+
+world_rank=22 node_rank=22 time=0.832232 checksum=4472.35
+  before: 22
+  pushed: 0-51
+  after:  22
+
+world_rank=23 node_rank=23 time=0.856503 checksum=4472.35
+  before: 23
+  pushed: 0-51
+  after:  23
+
+world_rank=24 node_rank=24 time=0.854465 checksum=4472.35
+  before: 24
+  pushed: 0-51
+  after:  24
+
+world_rank=25 node_rank=25 time=0.961106 checksum=4472.35
+  before: 25
+  pushed: 0-51
+  after:  25
+
+world_rank=26 node_rank=26 time=1.03962 checksum=4472.35
+  before: 26
+  pushed: 0-51
+  after:  26
+
+world_rank=27 node_rank=27 time=1.02656 checksum=4472.35
+  before: 27
+  pushed: 0-51
+  after:  27
+
+world_rank=28 node_rank=28 time=0.996172 checksum=4472.35
+  before: 28
+  pushed: 0-51
+  after:  28
+
+world_rank=29 node_rank=29 time=1.00748 checksum=4472.35
+  before: 29
+  pushed: 0-51
+  after:  29
+
+world_rank=30 node_rank=30 time=0.99748 checksum=4472.35
+  before: 30
+  pushed: 0-51
+  after:  30
+
+world_rank=31 node_rank=31 time=0.975457 checksum=4472.35
+  before: 31
+  pushed: 0-51
+  after:  31
+
+world_rank=32 node_rank=32 time=0.842571 checksum=4472.35
+  before: 32
+  pushed: 0-51
+  after:  32
+
+world_rank=33 node_rank=33 time=0.913371 checksum=4472.35
+  before: 33
+  pushed: 0-51
+  after:  33
+
+world_rank=34 node_rank=34 time=0.979942 checksum=4472.35
+  before: 34
+  pushed: 0-51
+  after:  34
+
+world_rank=35 node_rank=35 time=0.878315 checksum=4472.35
+  before: 35
+  pushed: 0-51
+  after:  35
+
+world_rank=36 node_rank=36 time=0.989564 checksum=4472.35
+  before: 36
+  pushed: 0-51
+  after:  36
+
+world_rank=37 node_rank=37 time=0.977336 checksum=4472.35
+  before: 37
+  pushed: 0-51
+  after:  37
+
+world_rank=38 node_rank=38 time=0.998747 checksum=4472.35
+  before: 38
+  pushed: 0-51
+  after:  38
+
+world_rank=39 node_rank=39 time=0.855266 checksum=4472.35
+  before: 39
+  pushed: 0-51
+  after:  39
+
+world_rank=40 node_rank=40 time=1.01307 checksum=4472.35
+  before: 40
+  pushed: 0-51
+  after:  40
+
+^[world_rank=41 node_rank=41 time=0.99609 checksum=4472.35
+  before: 41
+  pushed: 0-51
+  after:  41
+
+^[world_rank=42 node_rank=42 time=0.978155 checksum=4472.35
+  before: 42
+  pushed: 0-51
+  after:  42
+
+world_rank=43 node_rank=43 time=0.814969 checksum=4472.35
+  before: 43
+  pushed: 0-51
+  after:  43
+
+world_rank=44 node_rank=44 time=0.987812 checksum=4472.35
+  before: 44
+  pushed: 0-51
+  after:  44
+
+world_rank=45 node_rank=45 time=0.836389 checksum=4472.35
+  before: 45
+  pushed: 0-51
+  after:  45
+
+world_rank=46 node_rank=46 time=0.846759 checksum=4472.35
+  before: 46
+  pushed: 0-51
+  after:  46
+
+world_rank=47 node_rank=47 time=0.961887 checksum=4472.35
+  before: 47
+  pushed: 0-51
+  after:  47
+
+world_rank=48 node_rank=48 time=0.82679 checksum=4472.35
+  before: 48
+  pushed: 0-51
+  after:  48
+
+world_rank=49 node_rank=49 time=1.0073 checksum=4472.35
+  before: 49
+  pushed: 0-51
+  after:  49
+
+world_rank=50 node_rank=50 time=0.986544 checksum=4472.35
+  before: 50
+  pushed: 0-51
+  after:  50
+
+world_rank=51 node_rank=51 time=0.979073 checksum=4472.35
+  before: 51
+  pushed: 0-51
+  after:  51
+
+serialized Kokkos max section time = 51.3277 s
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ make -j exe_Quo
+[ 33%] Building CXX object CMakeFiles/exe_Quo.dir/src/MPI_Tpetra_Kokkos_Quo.cpp.o
+[ 66%] Linking CXX executable exe_Quo
+[100%] Built target exe_Quo
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+
+# USE_QUO 0 in code
+
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=false
+unset OMP_PLACES
+unset KOKKOS_NUM_THREADS
+
+mpirun --bind-to none -np 1 ./exe_Quo
+USE_QUO = 0
+world_size = 1
+node_size = 1
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 8944.27
+Tpetra max time = 0.123743 s
+
+-- serialized Kokkos region --
+
+world_rank=0 node_rank=0 time=0.721857 checksum=4472.35
+
+serialized Kokkos max section time = 0.745949 s
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ [200~mpirun --oversubscribe --map-by core --bind-to core -np 52 ./exe_Quo
+[200~mpirun: command not found
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ ~
+bash: /home/oesterle: Is a directory
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --oversubscribe --map-by core --bind-to core -np 52 ./exe_Quo
+USE_QUO = 0
+world_size = 52
+node_size = 52
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 8944.27
+Tpetra max time = 0.00772906 s
+
+-- serialized Kokkos region --
+
+world_rank=0 node_rank=0 time=28.693 checksum=4472.35
+
+world_rank=1 node_rank=1 time=28.6487 checksum=4472.35
+
+world_rank=2 node_rank=2 time=30.759 checksum=4472.35
+
+^C
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --oversubscribe --map-by none -np 52 ./exe_Quo
+--------------------------------------------------------------------------
+The specified mapping policy is not recognized:
+
+  Policy: none
+
+Please check for a typo or ensure that the option is a supported
+one.
+--------------------------------------------------------------------------
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --oversubscribe --bind-to none -np 52 ./exe_Quo
+USE_QUO = 0
+world_size = 52
+node_size = 52
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 8944.27
+Tpetra max time = 0.0121412 s
+
+-- serialized Kokkos region --
+
+world_rank=0 node_rank=0 time=3.22941 checksum=4472.35
+
+world_rank=1 node_rank=1 time=3.14791 checksum=4472.35
+
+world_rank=2 node_rank=2 time=2.98928 checksum=4472.35
+
+world_rank=3 node_rank=3 time=2.70955 checksum=4472.35
+
+world_rank=4 node_rank=4 time=3.2496 checksum=4472.35
+
+^C
+}

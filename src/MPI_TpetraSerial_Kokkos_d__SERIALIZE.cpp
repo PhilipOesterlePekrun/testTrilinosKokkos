@@ -58,7 +58,7 @@ class ScopedBlasThreads
 #endif
   {
 #ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
-    openblas_set_num_threads(num_threads);
+    //openblas_set_num_threads(num_threads);
 #else
     (void)num_threads;
 #endif
@@ -92,8 +92,9 @@ class ScopedBlasThreads
   static void print_info()
   {
 #ifdef TEST_HAVE_OPENBLAS_THREAD_CONTROL
+std::cout << "-- BLAS thread control information --\n";
     std::cout << "OpenBLAS config: " << openblas_get_config() << "\n";
-    std::cout << "OpenBLAS threads: " << openblas_get_num_threads() << "\n";
+    std::cout << "OpenBLAS threads: " << openblas_get_num_threads() << "\n\n";
 #else
     std::cout << "OpenBLAS thread control unavailable\n";
 #endif
@@ -280,19 +281,39 @@ int main(int argc, char* argv[])
   
   
   
-  ScopedBlasThreads::set_num_threads(1);
+  //ScopedBlasThreads::set_num_threads(1);
   if (!world_rank) {
-    std::cout << "-- BLAS thread control information --\n";
     ScopedBlasThreads::print_info();
-    std::cout << "\n";
   }
   
-    set_all_thread_affinity(std::to_string(node_rank));
-  
+    //set_all_thread_affinity(std::to_string(node_rank));
+  if(false) { //THIS IS THE THING
+  {
+    using LO = int;
+    using GO = int;
+    using map_type = Tpetra::Map<LO, GO>;
+    using vec_type = Tpetra::Vector<double, LO, GO>;
+      
+      
+          
+    using node_type = typename vec_type::node_type;
+    using device_type = typename vec_type::device_type;
+    using execution_space = typename vec_type::execution_space;
+    using memory_space = typename device_type::memory_space;
+
+    if (!world_rank) {
+      std::cout << "//##################-- Tpetra type information --\n";
+      std::cout << "vec_type::node_type        = " << typeid(node_type).name() << '\n';
+      std::cout << "vec_type::device_type      = " << typeid(device_type).name() << '\n';
+      std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
+      std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
+      std::cout << '\n';
+    }
+  }
   
   // Tpetra (with host NO because Tpetra_INST_CUDA=OFF)
   {
-    set_all_thread_affinity(std::to_string(node_rank));
+    //set_all_thread_affinity(std::to_string(node_rank));
     const auto startTime = std::chrono::steady_clock::now();
     
     using LO = int;
@@ -322,6 +343,10 @@ int main(int argc, char* argv[])
       std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
       std::cout << '\n';
     }
+    
+    if (!world_rank) {
+    ScopedBlasThreads::print_info();
+  }
 
     auto comm = Teuchos::rcp(
     new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
@@ -370,7 +395,7 @@ int main(int argc, char* argv[])
     
     // Tpetra with fixed global vector size independent of MPI rank count
 {
-  set_all_thread_affinity(std::to_string(node_rank));
+  //set_all_thread_affinity(std::to_string(node_rank));
 
   MPI_Barrier(MPI_COMM_WORLD);
   const auto startTime = std::chrono::steady_clock::now();
@@ -396,6 +421,10 @@ int main(int argc, char* argv[])
     std::cout << "vec_type::execution_space  = " << typeid(execution_space).name() << '\n';
     std::cout << "vec_type::memory_space     = " << typeid(memory_space).name() << '\n';
     std::cout << '\n';
+  }
+  
+  if (!world_rank) {
+    ScopedBlasThreads::print_info();
   }
 
   auto comm = Teuchos::rcp(
@@ -463,8 +492,12 @@ if (!world_rank) {
   print_proc_status("before UMFPACK", world_rank);
   // Amesos / UMFPACK test, with OpenBLAS forced to serial
 {
-  ScopedBlasThreads blas_threads(1);
-  set_all_thread_affinity(std::to_string(node_rank));
+  //ScopedBlasThreads blas_threads(1);
+  //set_all_thread_affinity(std::to_string(node_rank));
+  
+  if (!world_rank) {
+    ScopedBlasThreads::print_info();
+  }
 
   const auto startTime = std::chrono::steady_clock::now();
 
@@ -549,13 +582,111 @@ MPI_Barrier(MPI_COMM_WORLD);
   
   
   
+  
+  
+  
   if(!world_rank)
     std::cout<<"\n\n\n\n\n";
   
   
     Kokkos::fence();
-const int num_threads = omp_get_max_threads();
-set_all_thread_affinity("0-" + std::to_string(num_threads - 1)); //64
+    
+    if(!world_rank)
+      std::cout<<"START NEW SECTION //#LINE595\n";
+  
+  {
+  using exec_space = Kokkos::DefaultExecutionSpace;
+  using device_type = Kokkos::Device<exec_space, typename exec_space::memory_space>;
+
+  using matrix_type = Kokkos::View<double**, Kokkos::LayoutLeft, device_type>;
+  using vector_type = Kokkos::View<double**, Kokkos::LayoutLeft, device_type>;
+  using piv_type = Kokkos::View<int*, Kokkos::LayoutLeft, device_type>;
+
+  const int dense_n = 2000;
+  const int nrhs = 1;
+
+  // ----- 1 OpenBLAS thread -----
+  openblas_set_num_threads(1);
+
+  matrix_type A_1("A_1", dense_n, dense_n);
+  vector_type B_1("B_1", dense_n, nrhs);
+  piv_type piv_1("piv_1", dense_n);
+
+  Kokkos::parallel_for(
+      "init_A_1",
+      Kokkos::MDRangePolicy<exec_space, Kokkos::Rank<2>>({0, 0}, {dense_n, dense_n}),
+      KOKKOS_LAMBDA(const int i, const int j) {
+        const int dist = i > j ? i - j : j - i;
+        A_1(i, j) = i == j ? 4.0 : 1.0 / static_cast<double>(dense_n + 1 + dist);
+      });
+
+  Kokkos::parallel_for(
+      "init_B_1",
+      Kokkos::RangePolicy<exec_space>(0, dense_n),
+      KOKKOS_LAMBDA(const int i) {
+        B_1(i, 0) = 1.0 + 0.001 * static_cast<double>(i % 17);
+      });
+
+  Kokkos::fence();
+
+  std::cout << "\n-- gesv with 1 OpenBLAS thread --\n";
+  std::cout << "openblas_get_num_threads() = " << openblas_get_num_threads() << "\n";
+
+  const auto t1_start = std::chrono::steady_clock::now();
+  KokkosLapack::gesv(A_1, B_1, piv_1);
+  Kokkos::fence();
+  const auto t1_end = std::chrono::steady_clock::now();
+
+  std::cout << "gesv 1-thread time = "
+            << std::chrono::duration<double>(t1_end - t1_start).count()
+            << " s\n";
+
+  // ----- 64 OpenBLAS threads -----
+  openblas_set_num_threads(64);
+
+  matrix_type A_64("A_64", dense_n, dense_n);
+  vector_type B_64("B_64", dense_n, nrhs);
+  piv_type piv_64("piv_64", dense_n);
+
+  Kokkos::parallel_for(
+      "init_A_64",
+      Kokkos::MDRangePolicy<exec_space, Kokkos::Rank<2>>({0, 0}, {dense_n, dense_n}),
+      KOKKOS_LAMBDA(const int i, const int j) {
+        const int dist = i > j ? i - j : j - i;
+        A_64(i, j) = i == j ? 4.0 : 1.0 / static_cast<double>(dense_n + 1 + dist);
+      });
+
+  Kokkos::parallel_for(
+      "init_B_64",
+      Kokkos::RangePolicy<exec_space>(0, dense_n),
+      KOKKOS_LAMBDA(const int i) {
+        B_64(i, 0) = 1.0 + 0.001 * static_cast<double>(i % 17);
+      });
+
+  Kokkos::fence();
+
+  std::cout << "\n-- gesv with 64 OpenBLAS threads --\n";
+  std::cout << "openblas_get_num_threads() = " << openblas_get_num_threads() << "\n";
+
+  const auto t64_start = std::chrono::steady_clock::now();
+  KokkosLapack::gesv(A_64, B_64, piv_64);
+  Kokkos::fence();
+  const auto t64_end = std::chrono::steady_clock::now();
+
+  std::cout << "gesv 64-thread time = "
+            << std::chrono::duration<double>(t64_end - t64_start).count()
+            << " s\n";
+
+  openblas_set_num_threads(1);
+}
+} // THIS IS THE BIG IF FALSE
+  if(!world_rank)
+    std::cout<<"\n\n\n\n\n";
+  
+  
+    Kokkos::fence();
+
+//set_all_thread_affinity("0-" + std::to_string(num_threads - 1)); //64
 Kokkos::fence();
   // Pure Kokkos
   {
@@ -581,7 +712,6 @@ Kokkos::fence();
       std::cout << "Num devices = " << Kokkos::num_devices() << "\n";
       std::cout << "\n";      
     }
-    
     
     
     
@@ -686,9 +816,14 @@ ScopedAllThreadAffinity full_node_affinity(full_node_mask);
           
         // KokkosKernels dense LAPACK test, with OpenBLAS temporarily threaded
         {
-          ScopedBlasThreads blas_threads(omp_get_max_threads()); //64
+          //ScopedBlasThreads blas_threads(omp_get_max_threads()); //64
           
-          std::cout<<"(omp_get_max_threads() = "<<omp_get_max_threads()<<" = blas_threads)\n\n";
+          openblas_set_num_threads(omp_get_max_threads()); // <-- THIS IS NECESSARY //###### THE THREAD AFFINITY STUFF ON THE OTHER HAND DOES NOT SEEM TO BE NECESSARY
+          
+          //omp_set_num_threads(1); // doesnt affect anything
+          
+          std::cout<<"\n(omp_get_max_threads() = "<<omp_get_max_threads()<<"; openblas_get_num_threads() = "<<openblas_get_num_threads()<<")\n";
+          std::cout << "Kokkos Info: Threads in use: " << ExecSpace_Default_t().concurrency() << "\n\n";
 
           using DenseMatrix_d = ViewMatrix_d;
           using DenseVector_i = Kokkos::View<int*, Kokkos::LayoutLeft, Device_Default_t>;
@@ -753,7 +888,7 @@ ScopedAllThreadAffinity full_node_affinity(full_node_mask);
       sleepy_barrier(comm_node);//MPI_Barrier(comm_node);
     }
     Kokkos::fence();
-set_all_thread_affinity(std::to_string(node_rank));
+//set_all_thread_affinity(std::to_string(node_rank));
 Kokkos::fence();
     if (!world_rank) {
       std::cout << "Kokkos section total time:" << std::chrono::duration<double>(std::chrono::steady_clock::now() - startTime).count() << " s\n";

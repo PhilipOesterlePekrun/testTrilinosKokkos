@@ -11,7 +11,7 @@ srun \
   --cpu-bind=none \
   --pty bash -l
   
-(
+#(
 srun \
   --exclusive \
   --constraint=cascadelake \
@@ -21,7 +21,7 @@ srun \
   --cpus-per-task=52 \
   --cpu-bind=none \
   --pty bash -l
-)
+#)
 
 
 
@@ -30,28 +30,38 @@ module load cmake
 module load openmpi/4.1.8
 module load suite-sparse/5.4.0
 
-export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasThread_h100/install
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasThread_h100_clean/install
+#(
+export MY_TRILINOS_INSTALL=/home/oesterle/rd/Trilinos_Base/release_Upstream_E_int_full_kserial+openmp_openblasThread_cascadelake_clean_2/install
+#)
 export LD_LIBRARY_PATH=${MY_TRILINOS_INSTALL}/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/home/oesterle/rd/tpl/GKlib_base/install_so/lib:$LD_LIBRARY_PATH
+
+export OPENBLAS_ROOT=/home/oesterle/rd/tpl/OpenBLAS_base/install_thread_h100/
+export LD_LIBRARY_PATH=${OPENBLAS_ROOT}/lib:$LD_LIBRARY_PATH
 
 
 
 
 export OMP_PROC_BIND=spread # THIS IS IMPORTANT; PERFORMANCE GOES FROM 0.8s TO 3.8s WHEN WE UNSET THIS
 export OMP_NUM_THREADS=64 #32 # USE THIS TO CONTROL NUMBER OF THREADS
-(
-export OMP_NUM_THREADS=52
-)
+
 
 export KOKKOS_DISABLE_WARNINGS=1 # THIS IS JUST TO GET RID OF THE ANNOYING STUFF LIKE `Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.`
 
 export OMP_DYNAMIC=false
-export OMP_THREAD_LIMIT=64
-(
-export OMP_THREAD_LIMIT=52
-)
+export OMP_THREAD_LIMIT=64 # POSSIBLY OPTIONAL, BUT IT SEEMS TO CONSISTENTLY MAKE A VERY TINY POSITIVE PERFORMANCE DIFFERENCE IDK?
+
 
 export OPENBLAS_NUM_THREADS=1
+
+
+#(
+export OMP_NUM_THREADS=52 #32 # USE THIS TO CONTROL NUMBER OF THREADS
+export OMP_THREAD_LIMIT=52 # POSSIBLY OPTIONAL, BUT IT SEEMS TO CONSISTENTLY MAKE A VERY TINY POSITIVE PERFORMANCE DIFFERENCE IDK?
+#)
+
+
 
 
 ## BUILD
