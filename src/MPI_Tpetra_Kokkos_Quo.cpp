@@ -1,4 +1,4 @@
-#define USE_QUO 0
+#define USE_QUO 1
 
 #include <mpi.h>
 
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
       auto comm = Teuchos::rcp(
           new Teuchos::MpiComm<int>(Teuchos::opaqueWrapper(MPI_COMM_WORLD)));
 
-      const Tpetra::global_size_t global_num_rows = 20000000;
+      const Tpetra::global_size_t global_num_rows = 200000000;
 
       auto map = Teuchos::rcp(new map_type(global_num_rows, 0, comm));
 
@@ -128,152 +128,189 @@ int main(int argc, char** argv)
     }
 
     // -------------------------------------------------------------------------
-    // Region 2: serialized Kokkos region
-    // -------------------------------------------------------------------------
-    {
-      MPI_Barrier(MPI_COMM_WORLD);
+// Region 2: fixed number of distributed MIRCO-like problems
+// -------------------------------------------------------------------------
+{
+  MPI_Barrier(MPI_COMM_WORLD);
 
-      if (world_rank == 0) {
-        std::cout << "-- serialized Kokkos region --\n\n";
+  const int num_problems = 16;
+  const int n = 200000000;
+  const int num_iters = 20;
+
+  if (world_rank == 0) {
+    std::cout << "-- distributed serialized Kokkos problems --\n";
+    std::cout << "num_problems = " << num_problems << "\n";
+    std::cout << "n = " << n << "\n";
+    std::cout << "num_iters = " << num_iters << "\n\n";
+  }
+
+  const auto section_start_time = std::chrono::steady_clock::now();
+
+  int local_num_problems_done = 0;
+  double local_active_time = 0.0;
+
+  for (int problem_id = 0; problem_id < num_problems; ++problem_id) {
+    const int owner = problem_id % node_size;
+
+    if (node_rank == owner) {
+#if USE_QUO
+      char* before = nullptr;
+      char* pushed = nullptr;
+      char* after = nullptr;
+
+      QUO_stringify_cbind(quo, &before);
+
+      if (QUO_SUCCESS != QUO_bind_push(
+              quo,
+              QUO_BIND_PUSH_OBJ,
+              QUO_OBJ_MACHINE,
+              -1)) {
+        std::cerr << "QUO_bind_push failed on rank " << world_rank << "\n";
+        MPI_Abort(MPI_COMM_WORLD, 2);
       }
 
-      const auto section_start_time = std::chrono::steady_clock::now();
-
-      for (int owner = 0; owner < node_size; ++owner) {
-        if (node_rank == owner) {
-#if USE_QUO
-          char* before = nullptr;
-          char* pushed = nullptr;
-          char* after = nullptr;
-
-          QUO_stringify_cbind(quo, &before);
-
-          if (QUO_SUCCESS != QUO_bind_push(
-                  quo,
-                  QUO_BIND_PUSH_OBJ,
-                  QUO_OBJ_MACHINE,
-                  -1)) {
-            std::cerr << "QUO_bind_push failed on rank " << world_rank << "\n";
-            MPI_Abort(MPI_COMM_WORLD, 2);
-          }
-
-          QUO_stringify_cbind(quo, &pushed);
+      QUO_stringify_cbind(quo, &pushed);
 #endif
 
-          const auto start_time = std::chrono::steady_clock::now();
+      const auto problem_start_time = std::chrono::steady_clock::now();
 
-          using exec_space = Kokkos::DefaultExecutionSpace;
-          using device_type =
-              Kokkos::Device<exec_space, typename exec_space::memory_space>;
+      using exec_space = Kokkos::DefaultExecutionSpace;
+      using device_type =
+          Kokkos::Device<exec_space, typename exec_space::memory_space>;
 
-          using view_type =
-              Kokkos::View<double*, Kokkos::LayoutLeft, device_type>;
+      using view_type =
+          Kokkos::View<double*, Kokkos::LayoutLeft, device_type>;
 
-          const int n = 20000000;
-          const int num_iters = 20;
+      view_type x("x", n);
+      view_type y("y", n);
 
-          view_type x("x", n);
-          view_type y("y", n);
+      Kokkos::parallel_for(
+          "init",
+          Kokkos::RangePolicy<exec_space>(0, n),
+          KOKKOS_LAMBDA(const int i) {
+            x(i) =
+                1.0 +
+                0.000001 * static_cast<double>((i + problem_id) % 97);
+            y(i) = 0.0;
+          });
 
-          Kokkos::parallel_for(
-              "init",
-              Kokkos::RangePolicy<exec_space>(0, n),
-              KOKKOS_LAMBDA(const int i) {
-                x(i) = 1.0 + 0.000001 * static_cast<double>(i % 97);
-                y(i) = 0.0;
-              });
+      for (int iter = 0; iter < num_iters; ++iter) {
+        Kokkos::parallel_for(
+            "work",
+            Kokkos::RangePolicy<exec_space>(1, n - 1),
+            KOKKOS_LAMBDA(const int i) {
+              y(i) = 0.25 * x(i - 1) + 0.5 * x(i) + 0.25 * x(i + 1);
+            });
 
-          for (int iter = 0; iter < num_iters; ++iter) {
-            Kokkos::parallel_for(
-                "work",
-                Kokkos::RangePolicy<exec_space>(1, n - 1),
-                KOKKOS_LAMBDA(const int i) {
-                  y(i) = 0.25 * x(i - 1) + 0.5 * x(i) + 0.25 * x(i + 1);
-                });
-
-            Kokkos::parallel_for(
-                "update",
-                Kokkos::RangePolicy<exec_space>(1, n - 1),
-                KOKKOS_LAMBDA(const int i) {
-                  x(i) = y(i);
-                });
-          }
-
-          double sum = 0.0;
-
-          Kokkos::parallel_reduce(
-              "sum",
-              Kokkos::RangePolicy<exec_space>(0, n),
-              KOKKOS_LAMBDA(const int i, double& local_sum) {
-                local_sum += x(i) * x(i);
-              },
-              sum);
-
-          Kokkos::fence();
-
-          const double local_time =
-              std::chrono::duration<double>(
-                  std::chrono::steady_clock::now() - start_time)
-                  .count();
-
-#if USE_QUO
-          if (QUO_SUCCESS != QUO_bind_pop(quo)) {
-            std::cerr << "QUO_bind_pop failed on rank " << world_rank << "\n";
-            MPI_Abort(MPI_COMM_WORLD, 3);
-          }
-
-          QUO_stringify_cbind(quo, &after);
-#endif
-
-          std::cout << "world_rank=" << world_rank
-                    << " node_rank=" << node_rank
-                    << " time=" << local_time
-                    << " checksum=" << std::sqrt(sum) << "\n";
-
-#if USE_QUO
-          std::cout << "  before: " << (before ? before : "null") << "\n";
-          std::cout << "  pushed: " << (pushed ? pushed : "null") << "\n";
-          std::cout << "  after:  " << (after ? after : "null") << "\n";
-
-          std::free(before);
-          std::free(pushed);
-          std::free(after);
-#endif
-
-          std::cout << "\n";
-        }
-
-#if USE_QUO
-        if (QUO_SUCCESS != QUO_barrier(quo)) {
-          std::cerr << "QUO_barrier failed on rank " << world_rank << "\n";
-          MPI_Abort(MPI_COMM_WORLD, 4);
-        }
-#else
-        MPI_Barrier(comm_node);
-#endif
+        Kokkos::parallel_for(
+            "update",
+            Kokkos::RangePolicy<exec_space>(1, n - 1),
+            KOKKOS_LAMBDA(const int i) {
+              x(i) = y(i);
+            });
       }
 
-      const double section_time =
+      double sum = 0.0;
+
+      Kokkos::parallel_reduce(
+          "sum",
+          Kokkos::RangePolicy<exec_space>(0, n),
+          KOKKOS_LAMBDA(const int i, double& local_sum) {
+            local_sum += x(i) * x(i);
+          },
+          sum);
+
+      Kokkos::fence();
+
+      const double problem_time =
           std::chrono::duration<double>(
-              std::chrono::steady_clock::now() - section_start_time)
+              std::chrono::steady_clock::now() - problem_start_time)
               .count();
 
-      double max_section_time = 0.0;
+      local_active_time += problem_time;
+      ++local_num_problems_done;
 
-      MPI_Reduce(
-          &section_time,
-          &max_section_time,
-          1,
-          MPI_DOUBLE,
-          MPI_MAX,
-          0,
-          MPI_COMM_WORLD);
-
-      if (world_rank == 0) {
-        std::cout << "serialized Kokkos max section time = "
-                  << max_section_time << " s\n";
+#if USE_QUO
+      if (QUO_SUCCESS != QUO_bind_pop(quo)) {
+        std::cerr << "QUO_bind_pop failed on rank " << world_rank << "\n";
+        MPI_Abort(MPI_COMM_WORLD, 3);
       }
+
+      QUO_stringify_cbind(quo, &after);
+#endif
+
+      std::cout << "problem_id=" << problem_id
+                << " world_rank=" << world_rank
+                << " node_rank=" << node_rank
+                << " time=" << problem_time
+                << " checksum=" << std::sqrt(sum) << "\n";
+
+#if USE_QUO
+      std::cout << "  before: " << (before ? before : "null") << "\n";
+      std::cout << "  pushed: " << (pushed ? pushed : "null") << "\n";
+      std::cout << "  after:  " << (after ? after : "null") << "\n";
+
+      std::free(before);
+      std::free(pushed);
+      std::free(after);
+#endif
+
+      std::cout << "\n";
     }
+
+#if USE_QUO
+    if (QUO_SUCCESS != QUO_barrier(quo)) {
+      std::cerr << "QUO_barrier failed on rank " << world_rank << "\n";
+      MPI_Abort(MPI_COMM_WORLD, 4);
+    }
+#else
+    MPI_Barrier(comm_node);
+#endif
+  }
+
+  const double section_time =
+      std::chrono::duration<double>(
+          std::chrono::steady_clock::now() - section_start_time)
+          .count();
+
+  double max_section_time = 0.0;
+  double sum_active_time = 0.0;
+  int total_problems_done = 0;
+
+  MPI_Reduce(
+      &section_time,
+      &max_section_time,
+      1,
+      MPI_DOUBLE,
+      MPI_MAX,
+      0,
+      MPI_COMM_WORLD);
+
+  MPI_Reduce(
+      &local_active_time,
+      &sum_active_time,
+      1,
+      MPI_DOUBLE,
+      MPI_SUM,
+      0,
+      MPI_COMM_WORLD);
+
+  MPI_Reduce(
+      &local_num_problems_done,
+      &total_problems_done,
+      1,
+      MPI_INT,
+      MPI_SUM,
+      0,
+      MPI_COMM_WORLD);
+
+  if (world_rank == 0) {
+    std::cout << "total_problems_done = " << total_problems_done << "\n";
+    std::cout << "sum active problem time = " << sum_active_time << " s\n";
+    std::cout << "serialized section max time = "
+              << max_section_time << " s\n";
+  }
+}
 
 #if USE_QUO
     QUO_free(quo);

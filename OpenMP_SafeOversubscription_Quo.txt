@@ -519,3 +519,398 @@ world_rank=4 node_rank=4 time=3.2496 checksum=4472.35
 
 ^C
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+RESULTS CLOSER TO MIRCO STRUCTURE WITH DISTRIUTED PROBLEMS, AND LARGER PROBLEM SIZES n:{
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+# USE_QUO 0 in code
+
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=false
+unset OMP_PLACES
+unset KOKKOS_NUM_THREADS
+
+mpirun --bind-to none -np 1 ./exe_Quo
+USE_QUO = 0
+world_size = 1
+node_size = 1
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 1.31533 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=7.62452 checksum=14142.8
+
+problem_id=1 world_rank=0 node_rank=0 time=8.62374 checksum=14142.8
+
+problem_id=2 world_rank=0 node_rank=0 time=8.94374 checksum=14142.8
+
+problem_id=3 world_rank=0 node_rank=0 time=9.15096 checksum=14142.8
+
+problem_id=4 world_rank=0 node_rank=0 time=8.78402 checksum=14142.8
+
+^Coesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --bind-to none -np 52 ./exe_Quo
+--------------------------------------------------------------------------
+There are not enough slots available in the system to satisfy the 52
+slots that were requested by the application:
+
+  ./exe_Quo
+
+Either request fewer slots for your application, or make more slots
+available for use.
+
+A "slot" is the Open MPI term for an allocatable unit where we can
+launch a process.  The number of slots available are defined by the
+environment in which Open MPI processes are run:
+
+  1. Hostfile, via "slots=N" clauses (N defaults to number of
+     processor cores if not provided)
+  2. The --host command line parameter, via a ":N" suffix on the
+     hostname (N defaults to 1 if not provided)
+  3. Resource manager (e.g., SLURM, PBS/Torque, LSF, etc.)
+  4. If none of a hostfile, the --host command line parameter, or an
+     RM is present, Open MPI defaults to the number of processor cores
+
+In all the above cases, if you want Open MPI to default to the number
+of hardware threads instead of the number of processor cores, use the
+--use-hwthread-cpus option.
+
+Alternatively, you can use the --oversubscribe option to ignore the
+number of available slots when deciding the number of processes to
+launch.
+--------------------------------------------------------------------------
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --oversubscribe --bind-to none -np 52 ./exe_Quo
+USE_QUO = 0
+world_size = 52
+node_size = 52
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 0.0820661 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=18.7451 checksum=14142.8
+
+problem_id=1 world_rank=1 node_rank=1 time=17.1866 checksum=14142.8
+
+problem_id=2 world_rank=2 node_rank=2 time=18.3254 checksum=14142.8
+
+problem_id=3 world_rank=3 node_rank=3 time=17.7341 checksum=14142.8
+
+problem_id=4 world_rank=4 node_rank=4 time=17.0648 checksum=14142.8
+
+^C
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --oversubscribe --bind-to core --map-by core -np 52 ./exe_Quo
+USE_QUO = 0
+world_size = 52
+node_size = 52
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 0.0687665 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=304.759 checksum=14142.8
+
+^Coesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ echo "I CHANGE USE_QUO 1 IN THE .cpp NOW"
+I CHANGE USE_QUO 1 IN THE .cpp NOW
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+# Build with #define USE_QUO 1
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=false
+unset OMP_PLACES
+unset KOKKOS_NUM_THREADS
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ make -j exe_Quo
+[ 33%] Building CXX object CMakeFiles/exe_Quo.dir/src/MPI_Tpetra_Kokkos_Quo.cpp.o
+[ 66%] Linking CXX executable exe_Quo
+[100%] Built target exe_Quo
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+# Build with #define USE_QUO 1
+export OMP_NUM_THREADS=52
+export OMP_PROC_BIND=false
+unset OMP_PLACES
+unset KOKKOS_NUM_THREADS
+
+mpirun --oversubscribe --map-by core --bind-to core -np 52 ./exe_Quo
+
+
+USE_QUO = 1
+world_size = 52
+node_size = 52
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 0.0672878 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=7.83531 checksum=14142.8
+  before: 0
+  pushed: 0-51
+  after:  0
+
+problem_id=1 world_rank=1 node_rank=1 time=7.52287 checksum=14142.8
+  before: 1
+  pushed: 0-51
+  after:  1
+
+problem_id=2 world_rank=2 node_rank=2 time=7.55123 checksum=14142.8
+  before: 2
+  pushed: 0-51
+  after:  2
+
+problem_id=3 world_rank=3 node_rank=3 time=7.61236 checksum=14142.8
+  before: 3
+  pushed: 0-51
+  after:  3
+
+^[problem_id=4 world_rank=4 node_rank=4 time=7.73322 checksum=14142.8
+  before: 4
+  pushed: 0-51
+  after:  4
+
+^Coesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --oversubscribe --map-by core --bind-to core -np 1 ./exe_Quo
+USE_QUO = 1
+world_size = 1
+node_size = 1
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 1.31309 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=7.62637 checksum=14142.8
+  before: 0
+  pushed: 0-51
+  after:  0
+
+problem_id=1 world_rank=0 node_rank=0 time=7.64264 checksum=14142.8
+  before: 0
+  pushed: 0-51
+  after:  0
+
+problem_id=2 world_rank=0 node_rank=0 time=7.50989 checksum=14142.8
+  before: 0
+  pushed: 0-51
+  after:  0
+
+problem_id=3 world_rank=0 node_rank=0 time=7.48498 checksum=14142.8
+  before: 0
+  pushed: 0-51
+  after:  0
+
+^C
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --oversubscribe --bind-to none -np 52 ./exe_Quo
+USE_QUO = 1
+world_size = 52
+node_size = 52
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 0.100559 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=7.54634 checksum=14142.8
+  before: 0-51
+  pushed: 0-51
+  after:  0-51
+
+problem_id=1 world_rank=1 node_rank=1 time=7.47175 checksum=14142.8
+  before: 0-51
+  pushed: 0-51
+  after:  0-51
+
+problem_id=2 world_rank=2 node_rank=2 time=7.65983 checksum=14142.8
+  before: 0-51
+  pushed: 0-51
+  after:  0-51
+
+problem_id=3 world_rank=3 node_rank=3 time=7.69917 checksum=14142.8
+  before: 0-51
+  pushed: 0-51
+  after:  0-51
+
+^C
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ 
+oesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --map-by core --bind-to core -np 1 ./exe_Quo
+USE_QUO = 1
+world_size = 1
+node_size = 1
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 1.33048 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=7.62395 checksum=14142.8
+  before: 0
+  pushed: 0-51
+  after:  0
+
+problem_id=1 world_rank=0 node_rank=0 time=7.60384 checksum=14142.8
+  before: 0
+  pushed: 0-51
+  after:  0
+
+^Coesterle@node21:~/rd/testTrilinosKokkos_Base/build_quo$ mpirun --bind-to none -np 1 ./exe_Quo
+USE_QUO = 1
+world_size = 1
+node_size = 1
+Kokkos concurrency = 52
+Kokkos default execution space = N6Kokkos6OpenMPE
+
+-- Tpetra region --
+vec_type::node_type       = N6Tpetra12KokkosCompat23KokkosDeviceWrapperNodeIN6Kokkos6SerialENS2_9HostSpaceEEE
+vec_type::device_type     = N6Kokkos6DeviceINS_6SerialENS_9HostSpaceEEE
+vec_type::execution_space = N6Kokkos6SerialE
+Tpetra norm = 28284.3
+Tpetra max time = 1.31825 s
+
+-- distributed serialized Kokkos problems --
+num_problems = 16
+n = 200000000
+num_iters = 20
+
+problem_id=0 world_rank=0 node_rank=0 time=7.19148 checksum=14142.8
+  before: 0-51
+  pushed: 0-51
+  after:  0-51
+
+problem_id=1 world_rank=0 node_rank=0 time=7.7107 checksum=14142.8
+  before: 0-51
+  pushed: 0-51
+  after:  0-51
+
+}
